@@ -300,6 +300,15 @@
       .cf-wrap { max-height: calc(100dvh - var(--nav-h) - var(--tabbar-h) - 78px); -webkit-overflow-scrolling: touch; }
       .txn-wrap { -webkit-overflow-scrolling: touch; overflow-x: auto; }
 
+      /* Shrink the frozen A–D columns on Cashflow so period columns are still
+         visible after the freeze, instead of the frozen zone eating the whole
+         phone width. (Frozen-column left offsets are computed from actual
+         rendered width in JS, so shrinking these is enough — no JS change needed.) */
+      .cf-table td.label { min-width: 84px; max-width: 104px; white-space: normal; }
+      .cf-table td.amt { width: 54px; }
+      .cf-table td.due { width: 30px; padding-left: 2px; padding-right: 2px; }
+      .sec-label, .sec-label-empty { width: 12px; min-width: 12px; max-width: 12px; }
+
       /* Cards: 2-up grid, slightly tighter */
       .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .card { padding: 13px; border-radius: 10px; }
@@ -308,6 +317,11 @@
 
       /* 16px inputs prevent iOS auto-zoom; larger touch targets */
       .modal-field input, .modal-field select, .form-group input, .form-group select, .edit-input, .cf-edit-input { font-size: 16px; }
+      /* Ledger top-section cards (checking/category summary, date-range pickers,
+         payee filter) use small inline-styled inputs — bump them too so tapping
+         one doesn't trigger iOS's jarring auto-zoom, and give slightly more
+         breathing room for touch. */
+      .card input, .card select { font-size: 16px !important; padding: 4px 6px !important; }
       .btn { padding: 10px 16px; font-size: 14px; }
       .modal-btn { padding: 11px 18px; font-size: 14px; }
       .nav-btn, .page-btn { padding: 7px 12px; }
@@ -327,7 +341,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'v65';
+const APP_VERSION = 'v66';
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -2040,17 +2054,23 @@ function LedgerScreen({ data, setData }) {
   const [lastAddedId, setLastAddedId] = useState(() => localStorage.getItem('pfm_last_added_txn') || null);
   const lastAdded = useMemo(() => data.transactions.find(t => t.id === lastAddedId) || null, [data.transactions, lastAddedId]);
   function toggleFrozen() { setFrozen(v => { const next = !v; localStorage.setItem('pfm_ledger_frozen', next); return next; }); }
-  // Height of the frozen top section, in vh. Draggable via the divider; double-click resets.
+  // Height of the frozen top section, as % of the visible screen area. Draggable via the divider; double-click resets.
   const [frozenH, setFrozenH] = useState(() => {
     const saved = parseFloat(localStorage.getItem('pfm_ledger_frozen_h'));
-    return (saved >= 12 && saved <= 80) ? saved : 45;
+    return (saved >= 12 && saved <= 70) ? saved : 40;
   });
   const frozenTopRef = React.useRef(null);
   function startDragDivider(e) {
     e.preventDefault();
+    // Measure against the actual visible screen area (frozenTop's flex parent),
+    // not the raw device viewport — on mobile the nav bar + bottom tab bar
+    // already eat into window.innerHeight, so sizing off that overstates how
+    // much room the frozen section actually has and can crowd out the table.
+    const container = frozenTopRef.current ? frozenTopRef.current.parentElement : null;
+    const containerH = container ? container.getBoundingClientRect().height : window.innerHeight;
     const move = ev => {
       const top = frozenTopRef.current ? frozenTopRef.current.getBoundingClientRect().top : 0;
-      const vh = Math.min(80, Math.max(12, (ev.clientY - top) / window.innerHeight * 100));
+      const vh = Math.min(70, Math.max(12, (ev.clientY - top) / containerH * 100));
       setFrozenH(vh);
     };
     const up = () => {
@@ -2061,7 +2081,7 @@ function LedgerScreen({ data, setData }) {
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
   }
-  function resetDivider() { setFrozenH(45); localStorage.setItem('pfm_ledger_frozen_h', '45'); }
+  function resetDivider() { setFrozenH(40); localStorage.setItem('pfm_ledger_frozen_h', '40'); }
   const dateInputRef = React.useRef(null);
   const accounts = data.accounts;
   const checking = accounts.find(a => a.type === 'checking');
@@ -2423,7 +2443,7 @@ function LedgerScreen({ data, setData }) {
     <div className="screen" style={frozen ? {display:'flex', flexDirection:'column', overflow:'hidden', padding:0} : {overflowY:'auto', padding:0}}>
       {/* Frozen: cap the top section at 45% of the viewport and scroll it internally,
           so the toolbar + transactions below always stay visible (esp. on phones) */}
-      <div ref={frozenTopRef} style={frozen ? {flexShrink:0, maxHeight:frozenH + 'vh', overflowY:'auto', WebkitOverflowScrolling:'touch', padding:16, paddingBottom:8, background:'#f5f5f5'} : {padding:16, paddingBottom:8, background:'#f5f5f5'}}>
+      <div ref={frozenTopRef} style={frozen ? {flexShrink:0, maxHeight:frozenH + '%', overflowY:'auto', WebkitOverflowScrolling:'touch', padding:16, paddingBottom:8, background:'#f5f5f5'} : {padding:16, paddingBottom:8, background:'#f5f5f5'}}>
       <div className="ledger-top">
         {/* Checking */}
         <div className="card">
@@ -2852,7 +2872,7 @@ function LedgerScreen({ data, setData }) {
       </div>
 
       {/* Transaction table — all rows, paginated */}
-      <div className="txn-wrap" style={frozen ? {flex:1, display:'flex', flexDirection:'column', margin:'0 16px 8px'} : {margin:'0 16px 8px'}}>
+      <div className="txn-wrap" style={frozen ? {flex:'1 1 0%', minHeight:180, display:'flex', flexDirection:'column', margin:'0 16px 8px'} : {margin:'0 16px 8px'}}>
         <div style={frozen ? {overflowY:'auto', overflowX:'auto', flex:1} : {overflowX:'auto'}}>
           <TransactionTable transactions={paged} onUpdate={updateTxn} onDelete={deleteTxn}
             sortCol={sortCol} sortDir={sortDir} onSort={handleSort}

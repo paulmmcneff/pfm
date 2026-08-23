@@ -1,6 +1,8 @@
-// Service worker — offline support for the PWA.
-// Bump CACHE whenever APP_VERSION changes so phones pick up new versions.
-const CACHE = 'pfm-v66';
+// Service worker for the dedicated mobile PWA — scoped to /mobile/ only, so
+// it never collides with the desktop app's own service worker one level up.
+// Bump CACHE whenever APP_VERSION (in this folder's index.html) changes so
+// phones pick up new versions.
+const CACHE = 'pfm-mobile-m1';
 const ASSETS = [
   './',
   './index.html',

@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Personal Finance Manager</title>
-  <!-- PWA: installable home-screen app -->
+  <title>Personal Finance Manager — Mobile</title>
+  <!-- PWA: installable home-screen app. This is the dedicated phone build —
+       a separate file/scope from the desktop index.html one level up, so it
+       gets its own home-screen icon, its own service worker, and never
+       fights the desktop layout's CSS. -->
   <meta name="theme-color" content="#1a3a5c" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Finance" />
+  <meta name="apple-mobile-web-app-title" content="PFM Mobile" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -216,7 +219,7 @@
     .sort-icon { margin-left: 4px; font-size: 10px; }
     .sort-icon.active { color: #1a3a5c; }
     .sort-icon.inactive { color: #bbb; }
-    .txn-table td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; }
+    .txn-table td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; line-height: 17px; white-space: nowrap; }
     .txn-table tr:hover td { background: #f5f8ff; }
     .txn-table tr.row-clickable:hover td { background: #edf3ff; cursor: pointer; }
     .txn-table .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -233,6 +236,13 @@
     .btn-save { background: #1a3a5c; border: 1px solid #1a3a5c; border-radius: 3px; cursor: pointer; padding: 2px 6px; font-size: 11px; color: #fff; font-weight: 600; }
     .btn-save:hover { background: #1a5ca8; }
     .btn-cancel { background: none; border: 1px solid #bbb; border-radius: 3px; cursor: pointer; padding: 2px 6px; font-size: 11px; color: #555; }
+    /* Pin these to a fixed line-height (not the OS/browser's default "normal"
+       font metrics) so the actions cell renders the same height in every
+       browser — otherwise display-mode (btn-edit/btn-delete) and edit-mode
+       (btn-save/btn-cancel) rows can compute slightly different heights on
+       different platforms, making transactions appear to shift when you
+       click into edit mode. */
+    .btn-edit, .btn-delete, .btn-save, .btn-cancel { line-height: 17px; }
     .btn-cancel:hover { background: #f0f0f0; }
     .row-editing td { background: #f0f6ff !important; padding: 0 4px; height: 27px; vertical-align: middle; }
     .row-editing td:first-child { padding: 5px 10px; }
@@ -286,62 +296,62 @@
     .mobile-menu button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; background: none; border: none; padding: 13px 14px; font-size: 14px; font-weight: 500; color: #222; border-radius: 8px; cursor: pointer; }
     .mobile-menu button:active { background: #f0f4fc; }
 
-    @media (max-width: 700px) {
-      :root { --nav-h: calc(48px + env(safe-area-inset-top)); --tabbar-h: calc(56px + env(safe-area-inset-bottom)); }
-      .nav { height: var(--nav-h); padding: 0 12px; padding-top: env(safe-area-inset-top); }
-      .nav-title { margin-right: 0; font-size: 16px; }
-      .title-full { display: none; }
-      .title-short { display: inline; }
-      .nav-tabs { display: none; }
-      .nav-right { display: none; }
-      .nav-menu-btn { display: block; }
-      .tabbar { display: flex; }
-      .screen { height: calc(100dvh - var(--nav-h) - var(--tabbar-h)); padding: 12px; -webkit-overflow-scrolling: touch; }
-      .cf-wrap { max-height: calc(100dvh - var(--nav-h) - var(--tabbar-h) - 78px); -webkit-overflow-scrolling: touch; }
-      .txn-wrap { -webkit-overflow-scrolling: touch; overflow-x: auto; }
+    /* ─── This file is the dedicated phone app — these rules apply
+       unconditionally (no @media gate), since it's never opened at desktop
+       width. The desktop index.html stays a separate, untouched file. ─── */
+    :root { --nav-h: calc(48px + env(safe-area-inset-top)); --tabbar-h: calc(56px + env(safe-area-inset-bottom)); }
+    .nav { height: var(--nav-h); padding: 0 12px; padding-top: env(safe-area-inset-top); }
+    .nav-title { margin-right: 0; font-size: 16px; }
+    .title-full { display: none; }
+    .title-short { display: inline; }
+    .nav-tabs { display: none; }
+    .nav-right { display: none; }
+    .nav-menu-btn { display: block; }
+    .tabbar { display: flex; }
+    .screen { height: calc(100dvh - var(--nav-h) - var(--tabbar-h)); padding: 12px; -webkit-overflow-scrolling: touch; }
+    .cf-wrap { max-height: calc(100dvh - var(--nav-h) - var(--tabbar-h) - 78px); -webkit-overflow-scrolling: touch; }
+    .txn-wrap { -webkit-overflow-scrolling: touch; overflow-x: auto; }
 
-      /* Shrink the frozen A–D columns on Cashflow so period columns are still
-         visible after the freeze, instead of the frozen zone eating the whole
-         phone width. (Frozen-column left offsets are computed from actual
-         rendered width in JS, so shrinking these is enough — no JS change needed.) */
-      .cf-table td.label { min-width: 84px; max-width: 104px; white-space: normal; }
-      .cf-table td.amt { width: 54px; }
-      .cf-table td.due { width: 30px; padding-left: 2px; padding-right: 2px; }
-      .sec-label, .sec-label-empty { width: 12px; min-width: 12px; max-width: 12px; }
+    /* Cards: 2-up grid, slightly tighter */
+    .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .card { padding: 13px; border-radius: 10px; }
+    .card-value { font-size: 22px; }
+    .ledger-top { grid-template-columns: 1fr; }
 
-      /* Cards: 2-up grid, slightly tighter */
-      .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .card { padding: 13px; border-radius: 10px; }
-      .card-value { font-size: 22px; }
-      .ledger-top { grid-template-columns: 1fr; }
+    /* 16px inputs prevent iOS auto-zoom; larger touch targets */
+    .modal-field input, .modal-field select, .form-group input, .form-group select, .edit-input, .cf-edit-input { font-size: 16px; }
+    .btn { padding: 10px 16px; font-size: 14px; }
+    .modal-btn { padding: 11px 18px; font-size: 14px; }
+    .nav-btn, .page-btn { padding: 7px 12px; }
+    .btn-edit, .btn-delete, .btn-save, .btn-cancel { padding: 6px 10px; font-size: 12px; }
 
-      /* 16px inputs prevent iOS auto-zoom; larger touch targets */
-      .modal-field input, .modal-field select, .form-group input, .form-group select, .edit-input, .cf-edit-input { font-size: 16px; }
-      /* Ledger top-section cards (checking/category summary, date-range pickers,
-         payee filter) use small inline-styled inputs — bump them too so tapping
-         one doesn't trigger iOS's jarring auto-zoom, and give slightly more
-         breathing room for touch. */
-      .card input, .card select { font-size: 16px !important; padding: 4px 6px !important; }
-      .btn { padding: 10px 16px; font-size: 14px; }
-      .modal-btn { padding: 11px 18px; font-size: 14px; }
-      .nav-btn, .page-btn { padding: 7px 12px; }
-      .btn-edit, .btn-delete, .btn-save, .btn-cancel { padding: 6px 10px; font-size: 12px; }
+    /* Modals become bottom sheets */
+    .modal-overlay { align-items: flex-end; }
+    .modal { max-width: 100%; width: 100%; border-radius: 16px 16px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); }
 
-      /* Modals become bottom sheets */
-      .modal-overlay { align-items: flex-end; }
-      .modal { max-width: 100%; width: 100%; border-radius: 16px 16px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); }
+    /* Filter bar scrolls horizontally instead of stacking tall */
+    .filter-bar { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .filter-bar .form-group { flex: 0 0 auto; }
+    .form-row { row-gap: 10px; }
 
-      /* Filter bar scrolls horizontally instead of stacking tall */
-      .filter-bar { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      .filter-bar .form-group { flex: 0 0 auto; }
-      .form-row { row-gap: 10px; }
-    }
+    /* Shrink the frozen A–D columns on Cashflow so period columns are still
+       visible after the freeze, instead of the frozen zone eating the whole
+       phone width. */
+    .cf-table td.label { min-width: 84px; max-width: 104px; white-space: normal; }
+    .cf-table td.amt { width: 54px; }
+    .cf-table td.due { width: 30px; padding-left: 2px; padding-right: 2px; }
+    .sec-label, .sec-label-empty { width: 12px; min-width: 12px; max-width: 12px; }
+
+    /* Ledger top-section cards (checking/category summary, date-range
+       pickers, payee filter) use small inline-styled inputs — bump them too
+       so tapping one doesn't trigger iOS's jarring auto-zoom. */
+    .card input, .card select { font-size: 16px !important; padding: 4px 6px !important; }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'v66';
+const APP_VERSION = 'm1'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -1843,6 +1853,12 @@ function DashboardScreen({ data }) {
   );
 }
 
+// Cleared-status display (shared between TransactionTable and the Ledger
+// screen's "last cleared" summary chip).
+const CLEARED_OPTIONS = ['', 'yes', 'cc activity', 'cc pending', 'cc statement'];
+const CLEARED_LABEL = { yes:'Cleared', 'cc activity':'CC Activity', 'cc pending':'CC Pending', 'cc statement':'CC Statement', '':'—' };
+const CLEARED_CLASS = { yes:'cleared-yes', 'cc activity':'cleared-cc', 'cc pending':'cleared-pending', 'cc statement':'cleared-statement', '':'cleared-blank' };
+
 // ─── SHARED TRANSACTION TABLE ───────────────────────────────────────────────
 function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, sortDir, onSort, accounts = [], totals, filters, onFilterChange, highlightId }) {
   const [editingId, setEditingId] = useState(null);
@@ -1854,10 +1870,6 @@ function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [editingId]);
-
-  const CLEARED_OPTIONS = ['', 'yes', 'cc activity', 'cc pending', 'cc statement'];
-  const clearedLabel = { yes:'Cleared', 'cc activity':'CC Activity', 'cc pending':'CC Pending', 'cc statement':'CC Statement', '':'—' };
-  const clearedClass = { yes:'cleared-yes', 'cc activity':'cleared-cc', 'cc pending':'cleared-pending', 'cc statement':'cleared-statement', '':'cleared-blank' };
 
   const [focusField, setFocusField] = useState('payee');
 
@@ -1998,7 +2010,7 @@ function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, 
               </td>
               <td onClick={() => edit('date')}>{displayDate(t.date)}</td>
               <td onClick={() => edit('payee')}>{t.payee}</td>
-              <td onClick={() => edit('cleared')}><span className={clearedClass[t.cleared]||'cleared-blank'}>{clearedLabel[t.cleared]||'—'}</span></td>
+              <td onClick={() => edit('cleared')}><span className={CLEARED_CLASS[t.cleared]||'cleared-blank'}>{CLEARED_LABEL[t.cleared]||'—'}</span></td>
               <td className="num" onClick={() => edit('debit')}>{t.debit ? FMT_USD(t.debit) : ''}</td>
               <td className="num" onClick={() => edit('credit')}>{t.credit ? FMT_USD(t.credit) : ''}</td>
               <td onClick={() => edit('account')}>{t.account}</td>
@@ -2053,6 +2065,8 @@ function LedgerScreen({ data, setData }) {
   const [frozen, setFrozen] = useState(() => localStorage.getItem('pfm_ledger_frozen') !== 'false');
   const [lastAddedId, setLastAddedId] = useState(() => localStorage.getItem('pfm_last_added_txn') || null);
   const lastAdded = useMemo(() => data.transactions.find(t => t.id === lastAddedId) || null, [data.transactions, lastAddedId]);
+  const [lastClearedId, setLastClearedId] = useState(() => localStorage.getItem('pfm_last_cleared_txn') || null);
+  const lastCleared = useMemo(() => data.transactions.find(t => t.id === lastClearedId) || null, [data.transactions, lastClearedId]);
   function toggleFrozen() { setFrozen(v => { const next = !v; localStorage.setItem('pfm_ledger_frozen', next); return next; }); }
   // Height of the frozen top section, as % of the visible screen area. Draggable via the divider; double-click resets.
   const [frozenH, setFrozenH] = useState(() => {
@@ -2063,9 +2077,9 @@ function LedgerScreen({ data, setData }) {
   function startDragDivider(e) {
     e.preventDefault();
     // Measure against the actual visible screen area (frozenTop's flex parent),
-    // not the raw device viewport — on mobile the nav bar + bottom tab bar
-    // already eat into window.innerHeight, so sizing off that overstates how
-    // much room the frozen section actually has and can crowd out the table.
+    // not the raw device viewport — the nav bar + bottom tab bar already eat
+    // into window.innerHeight, so sizing off that overstates how much room
+    // the frozen section actually has and can crowd out the table.
     const container = frozenTopRef.current ? frozenTopRef.current.parentElement : null;
     const containerH = container ? container.getBoundingClientRect().height : window.innerHeight;
     const move = ev => {
@@ -2405,6 +2419,16 @@ function LedgerScreen({ data, setData }) {
   }
 
   function updateTxn(id, changes) {
+    // Track the most recent transaction whose Cleared status actually changed
+    // value (not just re-saved with the same value), so it can be surfaced
+    // next to the search field for quick reconciliation reference.
+    if (Object.prototype.hasOwnProperty.call(changes, 'cleared')) {
+      const prev = data.transactions.find(t => t.id === id);
+      if (prev && prev.cleared !== changes.cleared) {
+        setLastClearedId(id);
+        localStorage.setItem('pfm_last_cleared_txn', id);
+      }
+    }
     setData({ ...data, transactions: data.transactions.map(t => t.id === id ? { ...t, ...changes } : t) });
   }
 
@@ -2856,6 +2880,15 @@ function LedgerScreen({ data, setData }) {
         <input type="text" value={search} placeholder="Search payee, category, notes…"
           onChange={e => { setSearch(e.target.value); setPage(1); }}
           style={{flex:'1 1 200px', border:'1px solid #ccc', borderRadius:4, padding:'5px 8px', fontSize:13}} />
+        {lastCleared && (
+          <span
+            onClick={() => { setSearch(lastCleared.payee || ''); setPage(1); }}
+            title="Click to filter to this transaction"
+            style={{fontSize:11, padding:'3px 8px', border:'1px solid #9ab0d0', borderRadius:4, background:'#eef4fb', color:'#3a6090', cursor:'pointer', whiteSpace:'nowrap', fontWeight:600}}>
+            Last cleared: {lastCleared.payee || '(no payee)'} · {displayDate(lastCleared.date)} ·{' '}
+            <span className={CLEARED_CLASS[lastCleared.cleared]||'cleared-blank'} style={{fontWeight:700}}>{CLEARED_LABEL[lastCleared.cleared]||'—'}</span>
+          </span>
+        )}
         <span style={{fontSize:12, color:'#666', whiteSpace:'nowrap'}}>
           {txns.length < data.transactions.length
             ? <>{txns.length.toLocaleString()} of {data.transactions.length.toLocaleString()}</>
@@ -3116,7 +3149,7 @@ function App() {
       <nav className="nav">
         <span className="nav-title">
           <span className="title-full">Personal Finance Manager</span>
-          <span className="title-short">Finance</span>
+          <span className="title-short">PFM Mobile</span>
           {' '}<span style={{fontSize:10, opacity:0.6, fontWeight:400}}>{APP_VERSION}</span>
         </span>
         <div className="nav-tabs">

@@ -1,7 +1,7 @@
 {
-  "name": "Personal Finance Manager",
-  "short_name": "Finance",
-  "description": "Bi-weekly cashflow, ledger, and dashboard — your data stays on your device.",
+  "name": "Personal Finance Manager — Mobile",
+  "short_name": "PFM Mobile",
+  "description": "Bi-weekly cashflow, ledger, and dashboard, tuned for phone screens — your data stays on your device.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",

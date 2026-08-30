@@ -351,7 +351,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm1'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm2'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -602,7 +602,10 @@ const DEFAULT_DATA = {
     ],
     // Carryover exceptions: "expenseId|periodStartISO" keys for bills you've
     // marked as intentionally skipped (not owed) in an expired pay period
-    skippedCarryovers: []
+    skippedCarryovers: [],
+    // Carryover chips you've dismissed from the banner (display-only — unlike
+    // skippedCarryovers, this never changes payment reconciliation)
+    dismissedCarryovers: []
   },
   transactions: [],
   // One net-worth snapshot per pay period (keyed by period start date).
@@ -1244,6 +1247,29 @@ function CashflowScreen({ data, setData }) {
     setData({ ...data, cashflow: { ...data.cashflow, skippedCarryovers: (data.cashflow.skippedCarryovers || []).filter(k => !skippedKeys.has(k)) } });
   }
 
+  // "Dismiss" is display-only: it hides a carryover chip from the banner
+  // without touching the oldest-first payment reconciliation. This is the
+  // safe option for an *absorbed* entry -- clicking "release" there re-assigns
+  // that instance's payment forward to the current period's own due instance,
+  // which is only correct when the old bill genuinely wasn't owed. When it
+  // was actually paid (just posted a few days into the next period, so it
+  // perpetually shows as "absorbed"), release would incorrectly zero out the
+  // current period's forecast. Dismiss just acknowledges the notice.
+  function dismissCarryover(key) {
+    cfUndoStack.current.push(data);
+    if (cfUndoStack.current.length > 30) cfUndoStack.current.shift();
+    const valid = new Set([...carryRecon.entries, ...carryRecon.skippedEntries, ...carryRecon.absorbedEntries].map(e => e.key));
+    const pruned = (data.cashflow.dismissedCarryovers || []).filter(k => valid.has(k));
+    setData({ ...data, cashflow: { ...data.cashflow, dismissedCarryovers: [...pruned, key] } });
+  }
+
+  function restoreDismissedCarryovers() {
+    cfUndoStack.current.push(data);
+    if (cfUndoStack.current.length > 30) cfUndoStack.current.shift();
+    const visibleKeys = new Set([...carryRecon.entries, ...carryRecon.absorbedEntries].map(e => e.key));
+    setData({ ...data, cashflow: { ...data.cashflow, dismissedCarryovers: (data.cashflow.dismissedCarryovers || []).filter(k => !visibleKeys.has(k)) } });
+  }
+
   function startCfEdit(section, id, field, val) {
     setEditCell({ section, id, field });
     setEditVal(val === null || val === undefined ? '' : String(val));
@@ -1335,33 +1361,48 @@ function CashflowScreen({ data, setData }) {
           {[6, 13, 26, 52].map(n => <option key={n} value={n}>{n} periods</option>)}
         </select>
       </div>
-      {(carryRecon.entries.length > 0 || carryRecon.absorbedEntries.length > 0) && (
+      {(() => {
+        const dismissedSet = new Set(cf.dismissedCarryovers || []);
+        const visibleEntries = carryRecon.entries.filter(e => !dismissedSet.has(e.key));
+        const visibleAbsorbed = carryRecon.absorbedEntries.filter(e => !dismissedSet.has(e.key));
+        const dismissedCount = [...carryRecon.entries, ...carryRecon.absorbedEntries].filter(e => dismissedSet.has(e.key)).length;
+        return (<>
+      {(visibleEntries.length > 0 || visibleAbsorbed.length > 0) && (
         <div className="carryover-banner">
           <strong>⚠ Carried over from a previous pay period:</strong>
-          {carryRecon.entries.map(e => (
+          {visibleEntries.map(e => (
             <span key={e.key} className="carryover-chip">
               {e.name} {FMT_USD(e.amount)} <em>from {e.fromLabel}</em>
               <button onClick={() => skipCarryover(e.key)} title="Not owed — remove this one from the forecast">skip</button>
             </span>
           ))}
-          {carryRecon.absorbedEntries.map(e => (
-            <span key={e.key} className="carryover-chip" title={`This older unpaid "${e.name}" bill absorbed your recent payment (payments settle oldest-first), so the current period still shows it as due. If this old bill was never really owed, release the payment.`}>
+          {visibleAbsorbed.map(e => (
+            <span key={e.key} className="carryover-chip" title={`This older unpaid "${e.name}" bill absorbed your recent payment (payments settle oldest-first), so the current period still shows it as due. If this old bill was never really owed, release the payment to the current period. If it WAS owed and paid (just posted a little late), dismiss instead — that hides this notice without touching the current period's forecast.`}>
               {e.name} {FMT_USD(e.amount)} <em>from {e.fromLabel} — absorbed this period's payment</em>
-              <button onClick={() => skipCarryover(e.key)} title="Old bill not owed — release the payment to the current period">release</button>
+              <button onClick={() => skipCarryover(e.key)} title="Old bill not owed — release the payment to the current period (may zero out this period's forecast for this bill)">release</button>
+              <button onClick={() => dismissCarryover(e.key)} title="Old bill was paid — just hide this notice, current period is unaffected">dismiss</button>
             </span>
           ))}
           <span className="carryover-hint">Log the payment in the Ledger and it clears automatically.</span>
           {carryRecon.skippedEntries.length > 0 && (
             <button className="carryover-restore" onClick={restoreSkippedCarryovers}>restore {carryRecon.skippedEntries.length} skipped</button>
           )}
+          {dismissedCount > 0 && (
+            <button className="carryover-restore" onClick={restoreDismissedCarryovers}>restore {dismissedCount} dismissed</button>
+          )}
         </div>
       )}
-      {carryRecon.entries.length === 0 && carryRecon.skippedEntries.length > 0 && (
+      {visibleEntries.length === 0 && visibleAbsorbed.length === 0 && (carryRecon.skippedEntries.length > 0 || dismissedCount > 0) && (
         <div className="carryover-skipped-note">
-          {carryRecon.skippedEntries.length} carryover{carryRecon.skippedEntries.length > 1 ? 's' : ''} skipped
-          {' '}<button className="carryover-restore" onClick={restoreSkippedCarryovers}>restore</button>
+          {carryRecon.skippedEntries.length > 0 && <>{carryRecon.skippedEntries.length} carryover{carryRecon.skippedEntries.length > 1 ? 's' : ''} skipped
+          {' '}<button className="carryover-restore" onClick={restoreSkippedCarryovers}>restore</button></>}
+          {carryRecon.skippedEntries.length > 0 && dismissedCount > 0 && <span> · </span>}
+          {dismissedCount > 0 && <>{dismissedCount} dismissed
+          {' '}<button className="carryover-restore" onClick={restoreDismissedCarryovers}>restore</button></>}
         </div>
       )}
+        </>);
+      })()}
       <div className="cf-wrap">
         <table className="cf-table" ref={cfTableRef}>
           <thead>

@@ -414,12 +414,56 @@
     .txe-delete { display: block; width: 100%; margin-top: 10px; border: none; background: none; color: #cc2200; font-size: 14px; font-weight: 600; padding: 8px; cursor: pointer; }
     .txe-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabbar-h, 56px) + 84px); background: rgba(26,58,92,0.95); color: #fff; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 3000; white-space: nowrap; animation: txeIn .2s ease-out; }
     @keyframes txeIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    /* LEDGER (mobile accounts view) */
+    .lg-screen { padding: 12px 12px 0 !important; background: #f5f5f5; }
+    .lg-hero { background: linear-gradient(135deg, #1a3a5c 0%, #2d5a8e 100%); color: #fff; border-radius: 16px; padding: 18px 18px 14px; box-shadow: 0 6px 18px rgba(26,58,92,0.25); }
+    .lg-hero-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; }
+    .lg-hero-amt { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: 4px 0 10px; }
+    .lg-hero-amt.neg { color: #ffb4a8; }
+    .lg-hero-row { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; opacity: 0.85; }
+    .lg-hero-row b { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .lg-sec { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #777; text-transform: uppercase; letter-spacing: 0.05em; padding: 18px 4px 6px; }
+    .lg-add { border: none; background: none; color: #1a5ca8; font-size: 13px; font-weight: 700; text-transform: none; letter-spacing: 0; padding: 0; cursor: pointer; }
+    .lg-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; }
+    .lg-row { display: flex; align-items: center; gap: 10px; padding: 12px 12px 12px 14px; border-top: 1px solid #eee; cursor: pointer; }
+    .lg-card > :first-child { border-top: none; }
+    .lg-row:active { background: #f2f6fb; }
+    .lg-main { flex: 1; min-width: 0; }
+    .lg-name { font-size: 14px; font-weight: 600; color: #222; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .lg-meta { font-size: 11px; color: #888; margin-top: 2px; }
+    .lg-amt { flex-shrink: 0; font-size: 15px; font-weight: 700; color: #1a3a5c; font-variant-numeric: tabular-nums; }
+    .lg-amt.big { font-size: 20px; }
+    .lg-amt-col { text-align: right; flex-shrink: 0; }
+    .lg-sub { font-size: 11px; color: #888; margin-top: 2px; }
+    .lg-screen .neg { color: #cc2200; } .lg-screen .pos, .lg-amt.pos { color: #1a7a1a; }
+    .lg-chev { color: #c4cad3; font-size: 20px; line-height: 1; margin-left: -2px; }
+    .lg-kv { display: flex; justify-content: space-between; padding: 10px 14px; border-top: 1px solid #eee; font-size: 13px; color: #666; }
+    .lg-kv b { color: #222; font-variant-numeric: tabular-nums; }
+    .lg-total { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-top: 1px solid #e6e9ee; background: #f8fafc; font-size: 12px; color: #667; }
+    .lg-total b { font-size: 14px; color: #1a3a5c; font-variant-numeric: tabular-nums; }
+    .lg-link { display: flex; justify-content: space-between; align-items: center; width: 100%; border: none; border-top: 1px solid #eee; background: #fff; padding: 12px 14px; font-size: 14px; font-weight: 600; color: #1a5ca8; cursor: pointer; text-align: left; }
+    .lg-link:active { background: #f2f6fb; }
+    .lg-link.danger { color: #cc2200; }
+    .lg-empty { padding: 14px; font-size: 12px; color: #999; }
+    .lg-pill { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; text-transform: lowercase; }
+    .lg-pill.promo { color: #b85c00; background: #fff4e5; }
+    .lg-pill.apr { color: #8a2be2; background: #f6efff; }
+    .lg-pill.asset { color: #1a7a1a; background: #ebf6eb; }
+    .lg-pill.liability { color: #cc2200; background: #fdeeea; }
+    .lg-toggle { flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px; border: 2px solid #c8d3e0; background: #fff; color: #fff; font-size: 13px; font-weight: 700; padding: 0; cursor: pointer; }
+    .lg-toggle.on { background: #1a3a5c; border-color: #1a3a5c; }
+    .lg-inline { display: flex; gap: 8px; align-items: center; } .lg-inline .txe-input { flex: 1; min-width: 0; }
+    .lg-clear { flex-shrink: 0; margin-top: 6px; border: 1px solid #c8d3e0; background: #fff; color: #1a3a5c; border-radius: 10px; padding: 9px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .lg-breakdown { margin-top: 16px; background: #f6f8fb; border-radius: 10px; padding: 4px 12px; }
+    .lg-breakdown > div { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; color: #667; border-top: 1px solid #e8ecf1; }
+    .lg-breakdown > div:first-child { border-top: none; }
+    .lg-breakdown b { color: #222; font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm7'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm9'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -1054,7 +1098,7 @@ function CashflowScreen({ data, setData }) {
   // ── Coordinate overlay ──────────────────────────────────────────────────────
   const [showCoords, setShowCoords] = useState(() => localStorage.getItem('pfm_coords') === 'true');
 
-  // ── Freeze rows 1-10 AND columns A-D via sticky ─────────────────────────────
+  // ── Freeze panes at C3: rows 1–2 (header rows) AND columns A–B via sticky ────
   // useLayoutEffect with no dep array: re-stamps after every render so freshly-
   // mounted sub-component <td>s (BalCell/Cell/ECell) never lose the style.
   const cfTableRef = useRef(null);
@@ -1084,7 +1128,7 @@ function CashflowScreen({ data, setData }) {
     const hRow = table.querySelector('.row-period-header') || allRows[0];
     const hCells = [...hRow.querySelectorAll('td')];
     const hasCoord = hCells[0]?.classList.contains('coord-cell');
-    const nFrozenCols = hasCoord ? 5 : 4; // coord? + sec-label + label + amt + due
+    const nFrozenCols = hasCoord ? 3 : 2; // coord? + A (sec-label) + B (label)
     const colLefts = [];
     let cumL = 0;
     for (const hc of hCells) { colLefts.push(cumL); cumL += hc.offsetWidth; }
@@ -1097,7 +1141,8 @@ function CashflowScreen({ data, setData }) {
     let rowsDone = false;
 
     for (const tr of allRows) {
-      const isFrozenRow = !rowsDone;
+      // Rows 1–2 (balance + period header) plus the coord letter row all live in <thead>
+      const isFrozenRow = tr.parentElement && tr.parentElement.tagName === 'THEAD';
       const cells = [...tr.querySelectorAll('td')];
       let vCol = 0; // actual visual column index
 
@@ -1132,7 +1177,6 @@ function CashflowScreen({ data, setData }) {
       }
 
       cumHeight += tr.offsetHeight;
-      if (isFrozenRow && tr.classList.contains('row-subtotal')) rowsDone = true;
     }
   });
 
@@ -2191,7 +2235,7 @@ function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, 
 }
 
 // ─── LEDGER SCREEN ──────────────────────────────────────────────────────────
-function LedgerScreen({ data, setData }) {
+function LedgerScreen({ data, setData, onOpenTxns }) {
   const [form, setForm] = useState(() => {
     // Default Cleared to whatever the last-added transaction used (survives reloads)
     const last = data.transactions.find(t => t.id === localStorage.getItem('pfm_last_added_txn'));
@@ -2617,485 +2661,331 @@ function LedgerScreen({ data, setData }) {
   const cashTotalAll = cashAccounts.reduce((s, a) => s + (a.currentBalance || 0), 0);
   const netWorth = (checking?.currentBalance || 0) + cashTotalAll + otherNet - ccTotalAll;
 
+  // ── Mobile sheet editing (one bottom sheet, several kinds) ──────────────────
+  const [lsheet, setLsheet] = useState(null); // { kind, id?, vals }
+  function setLV(ch) { setLsheet(s => ({ ...s, vals: { ...s.vals, ...ch } })); }
+  const cleanNum = v => v.replace(/[^0-9.\-]/g, '').replace(/(\..*)\./g, '$1');
+
+  // Apply a patch to one account in a single write; optional rename remaps its transactions
+  function commitAccount(id, patch, newShort) {
+    const acct = accounts.find(a => a.id === id); if (!acct) return false;
+    let txs = data.transactions; let p = { ...patch };
+    if (newShort !== undefined) {
+      const sn = (newShort || '').trim().toLowerCase();
+      if (sn && sn !== acct.shortName) {
+        if (accounts.some(a => a.id !== id && a.shortName === sn)) { window.alert(`An account with short name "${sn}" already exists.`); return false; }
+        const n = txs.filter(t => t.account === acct.shortName).length;
+        if (n > 0 && !window.confirm(`Rename "${acct.shortName}" to "${sn}"?\n${n.toLocaleString()} transaction(s) will be updated to the new name.`)) return false;
+        txs = txs.map(t => t.account === acct.shortName ? { ...t, account: sn } : t);
+        p = { ...p, name: sn, shortName: sn };
+      }
+    }
+    setData({ ...data, transactions: txs, accounts: accounts.map(a => {
+      if (a.id !== id) return a;
+      const next = { ...a, ...p };
+      Object.keys(next).forEach(k => next[k] === undefined && delete next[k]);
+      return next;
+    })});
+    return true;
+  }
+  function removeFromSheet(id) {
+    const before = accounts.length;
+    removeAccount(id);
+    setLsheet(null);
+  }
+
+  function saveLsheet() {
+    const s = lsheet, v = s.vals;
+    if (s.kind === 'checking') {
+      commitAccount(checking.id, { currentBalance: parseFloat(v.amount) || 0, lastUpdated: stampNow() });
+    } else if (s.kind === 'card') {
+      const apr = parseFloat(v.apr);
+      if (!commitAccount(s.id, { promoExpiry: v.promo || undefined, apr: (isNaN(apr) || apr <= 0) ? undefined : apr }, v.name)) return;
+    } else if (s.kind === 'cash') {
+      if (!commitAccount(s.id, { currentBalance: parseFloat(v.amount) || 0, lastUpdated: stampNow() }, v.name)) return;
+    } else if (s.kind === 'other') {
+      commitAccount(s.id, { name: v.name.trim() || undefined, type: v.type, balance: parseFloat(v.amount) || 0, lastUpdated: stampNow(), selected: v.selected || undefined });
+    } else if (s.kind === 'tracker') {
+      setData({ ...data, categorySummaries: data.categorySummaries.map(cs => cs.id === s.id
+        ? { ...cs, label: v.label, splitWays: parseInt(v.splitWays) || 1, payeeFilter: { mode: v.mode, payees: v.payees } } : cs) });
+      setCatDateRanges(r => ({ ...r, [s.id]: { from: v.from, to: v.to } }));
+    } else if (s.kind === 'add') {
+      const name = v.name.trim();
+      if (!name) return;
+      const sn = name.toLowerCase();
+      if (v.type !== 'other' && accounts.some(a => a.shortName === sn)) { window.alert(`An account with short name "${sn}" already exists.`); return; }
+      const acct = v.type === 'card'
+        ? { id: `cc_${Date.now()}`, name: sn, shortName: sn, type: 'credit', statementBalance: 0, activityBalance: 0, pendingBalance: 0, ...(v.promo ? { promoExpiry: v.promo } : {}) }
+        : v.type === 'cash'
+          ? { id: `cash_${Date.now()}`, name: sn, shortName: sn, type: 'cash', currentBalance: parseFloat(v.amount) || 0, lastUpdated: stampNow() }
+          : { id: `oa_${Date.now()}`, name, type: v.otherType, balance: parseFloat(v.amount) || 0, lastUpdated: stampNow() };
+      setData({ ...data, accounts: [...accounts, acct] });
+    }
+    setLsheet(null);
+  }
+
+  const go = (opts) => onOpenTxns && onOpenTxns(opts);
+  const ccTotals = creditCards.reduce((t, c) => { const b = ccBalances[c.id] || {}; return { s: t.s + (b.statement||0), a: t.a + (b.activity||0), p: t.p + (b.pending||0) }; }, { s:0, a:0, p:0 });
+  const fmtRange = r => (r?.from || r?.to) ? `${r.from ? displayDate(r.from) : '…'} – ${r.to ? displayDate(r.to) : 'now'}` : 'All time';
+  const Chev = () => <span className="lg-chev">›</span>;
+  const v = lsheet?.vals;
+
   return (
-    <div className="screen" style={frozen ? {display:'flex', flexDirection:'column', overflow:'hidden', padding:0} : {overflowY:'auto', padding:0}}>
-      {/* Frozen: cap the top section at 45% of the viewport and scroll it internally,
-          so the toolbar + transactions below always stay visible (esp. on phones) */}
-      <div ref={frozenTopRef} style={frozen ? {flexShrink:0, maxHeight:frozenH + '%', overflowY:'auto', WebkitOverflowScrolling:'touch', padding:16, paddingBottom:8, background:'#f5f5f5'} : {padding:16, paddingBottom:8, background:'#f5f5f5'}}>
-      <div className="ledger-top">
-        {/* Checking */}
-        <div className="card">
-          <div className="card-title">Checking — {checking?.name}</div>
-          <table className="account-table">
-            <tbody>
-              <tr>
-                <td>Current Balance</td>
-                <td style={{textAlign:'right', fontWeight:700, color:'#1a3a5c'}}>
-                  <InlineNum editKey="currentBalance" value={checking?.currentBalance}
-                    onSave={v => saveAccountField('currentBalance', v)} />
-                </td>
-              </tr>
-              <tr><td>Cleared Balance</td><td style={{textAlign:'right', color:'#555'}}>{FMT_USD(computedClearedBalance)}</td></tr>
-              <tr>
-                <td style={{fontSize:11, color:'#888'}}>Last updated</td>
-                <td style={{textAlign:'right', fontSize:11, color:'#888'}}>
-                  <InlineText editKey="lastUpdated" value={WITH_YEAR(checking?.lastUpdated) || '—'}
-                    onSave={v => saveAccountText('lastUpdated', v)} style={{color:'#888', fontSize:11}} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <div className="screen lg-screen">
+      {/* Net worth hero */}
+      <div className="lg-hero">
+        <div className="lg-hero-label">Net worth</div>
+        <div className={`lg-hero-amt ${netWorth < 0 ? 'neg' : ''}`}>{FMT_USD_SIGNED(netWorth)}</div>
+        <div className="lg-hero-row">
+          <span>Checking <b>{FMT_USD(checking?.currentBalance || 0)}</b></span>
+          {cashAccounts.length > 0 && <span>Cash <b>{FMT_USD(cashTotalAll)}</b></span>}
+          <span>Cards <b>−{FMT_USD(ccTotalAll)}</b></span>
+          {otherAccounts.length > 0 && <span>Other <b>{FMT_USD_SIGNED(otherNet)}</b></span>}
+        </div>
+      </div>
+
+      {/* Checking */}
+      {checking && <>
+        <div className="lg-sec"><span>Checking</span></div>
+        <div className="lg-card">
+          <div className="lg-row" onClick={() => setLsheet({ kind:'checking', vals:{ amount: String(checking.currentBalance || 0) } })}>
+            <div className="lg-main">
+              <div className="lg-name">{checking.name || 'Checking'}</div>
+              <div className="lg-meta">Updated {WITH_YEAR(checking.lastUpdated) || '—'} · tap to update balance</div>
+            </div>
+            <div className="lg-amt big">{FMT_USD(checking.currentBalance || 0)}</div><Chev />
+          </div>
+          <div className="lg-kv"><span>Cleared balance</span><b>{FMT_USD(computedClearedBalance)}</b></div>
+          <div className="lg-kv"><span>Min projected{cashflowMinPeriod ? ` (${cashflowMinPeriod.label})` : ''}</span><b className={cashflowMinBal < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(cashflowMinBal)}</b></div>
+          <button className="lg-link" onClick={() => go({ account: checking.shortName })}>View checking transactions <Chev /></button>
+        </div>
+      </>}
+
+      {/* Trackers */}
+      {catSums.length > 0 && <>
+        <div className="lg-sec"><span>Trackers</span></div>
+        <div className="lg-card">
           {catSums.map(cs => {
-            const range = catDateRanges[cs.id] || {};
-            const setRange = (field, val) => setCatDateRanges(r => ({ ...r, [cs.id]: { ...(r[cs.id]||{}), [field]: val } }));
-            const pf = cs.payeeFilter || { mode: 'exclude', payees: [] };
-            const isExpanded = expandedCatFilter === cs.id;
-            const splitWays = cs.splitWays || 1;
-            const hasFilter = pf.payees.length > 0 || splitWays > 1;
+            const split = cs.splitWays || 1;
+            const pf = cs.payeeFilter || { mode:'exclude', payees:[] };
+            const r = catDateRanges[cs.id];
             return (
-              <div key={cs.id} style={{marginTop:8, paddingTop:8, borderTop:'1px solid #f0f0f0', fontSize:12}}>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:8}}>
-                  <div style={{display:'flex', alignItems:'center', gap:4}}>
-                    <InlineText editKey={`cs_label_${cs.id}`} value={cs.label} onSave={v => saveCatSum(cs.id, 'label', v)} />
-                    <button
-                      onClick={() => setExpandedCatFilter(isExpanded ? null : cs.id)}
-                      title={hasFilter ? `Payee filter active (${pf.mode})` : 'Add payee filter'}
-                      style={{background:'none', border:'none', cursor:'pointer', fontSize:11, padding:'0 2px',
-                        color: hasFilter ? '#1a5a9c' : '#aaa', fontWeight: hasFilter ? 700 : 400}}
-                    >⚙</button>
-                  </div>
-                  <div style={{display:'flex', gap:6, alignItems:'center', flexWrap:'wrap', justifyContent:'flex-end'}}>
-                    <input type="date" value={range.from||''} onChange={e=>setRange('from',e.target.value)}
-                      style={{border:'1px solid #ccd6f0', borderRadius:3, padding:'1px 4px', fontSize:11, color:'#555'}} />
-                    <span style={{color:'#bbb', fontSize:10}}>–</span>
-                    <input type="date" value={range.to||''} onChange={e=>setRange('to',e.target.value)}
-                      style={{border:'1px solid #ccd6f0', borderRadius:3, padding:'1px 4px', fontSize:11, color:'#555'}} />
-                    {(range.from||range.to) && <button onClick={()=>setCatDateRanges(r=>({...r,[cs.id]:{}}))} style={{fontSize:10, color:'#aaa', background:'none', border:'none', cursor:'pointer', padding:'0 2px'}} title="Clear dates">✕</button>}
-                    <span style={{color:'#888', marginLeft:4}}>income <span style={{color:'#1a7a1a', fontWeight:600}}>{FMT_USD(cs.income)}</span></span>
-                    <span style={{color:'#888'}}>expenses <span style={{color:'#cc2200', fontWeight:600}}>{FMT_USD(cs.expenses)}</span></span>
-                    <span style={{color:'#888'}}>net <span style={{color: cs.net >= 0 ? '#1a7a1a' : '#cc2200', fontWeight:600}}>{FMT_USD(cs.net)}</span></span>
-                    {splitWays > 1 && (
-                      <span style={{color:'#888'}} title={`Net divided ${splitWays} ways`}>
-                        ÷{splitWays} = <span style={{color:'#1a3a5c', fontWeight:700}}>{FMT_USD(Math.abs(cs.net) / splitWays)}</span> each
-                      </span>
-                    )}
+              <div key={cs.id} className="lg-row" onClick={() => setLsheet({ kind:'tracker', id: cs.id, vals: {
+                  label: cs.label || '', splitWays: String(split), mode: pf.mode === 'include' ? 'include' : 'exclude',
+                  payees: [...(pf.payees || [])], newPayee: '', from: r?.from || '', to: r?.to || '' } })}>
+                <div className="lg-main">
+                  <div className="lg-name">{cs.label || 'untitled'}</div>
+                  <div className="lg-meta">
+                    <span className="txs-in">+{FMT_USD(cs.income)}</span> · <span className="neg">−{FMT_USD(cs.expenses)}</span> · {fmtRange(r)}
+                    {pf.payees?.length > 0 && <> · {pf.mode === 'include' ? 'only' : 'excl.'} {pf.payees.length} payee{pf.payees.length > 1 ? 's' : ''}</>}
                   </div>
                 </div>
-                {isExpanded && (
-                  <div style={{marginTop:6, padding:'8px 10px', background:'#f0f4fb', borderRadius:4, border:'1px solid #ccd6f0'}}>
-                    <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:6}}>
-                      <span style={{color:'#555', fontWeight:600}}>Payee filter</span>
-                      <label style={{display:'flex', alignItems:'center', gap:3, cursor:'pointer'}}>
-                        <input type="radio" name={`pf_mode_${cs.id}`} value="exclude" checked={pf.mode !== 'include'}
-                          onChange={() => updateCatFilter(cs.id, { mode: 'exclude' })} /> Exclude
-                      </label>
-                      <label style={{display:'flex', alignItems:'center', gap:3, cursor:'pointer'}}>
-                        <input type="radio" name={`pf_mode_${cs.id}`} value="include" checked={pf.mode === 'include'}
-                          onChange={() => updateCatFilter(cs.id, { mode: 'include' })} /> Include only
-                      </label>
-                    </div>
-                    <div style={{display:'flex', flexWrap:'wrap', gap:4, marginBottom:6}}>
-                      {pf.payees.map(p => (
-                        <span key={p} style={{display:'inline-flex', alignItems:'center', gap:3, background:'#1a3a5c', color:'#fff', borderRadius:3, padding:'1px 6px', fontSize:11}}>
-                          {p}
-                          <button onClick={() => removePayeeFromFilter(cs.id, p)}
-                            style={{background:'none', border:'none', color:'#ccd', cursor:'pointer', fontSize:12, lineHeight:1, padding:0}} title="Remove">×</button>
-                        </span>
-                      ))}
-                      {pf.payees.length === 0 && <span style={{color:'#aaa', fontStyle:'italic'}}>No payees — filter inactive</span>}
-                    </div>
-                    <div style={{display:'flex', gap:4}}>
-                      <input
-                        type="text"
-                        placeholder="Add payee (partial match ok)"
-                        value={newPayeeInputs[cs.id] || ''}
-                        onChange={e => setNewPayeeInputs(v => ({ ...v, [cs.id]: e.target.value }))}
-                        onKeyDown={e => { if (e.key === 'Enter') addPayeeToFilter(cs.id, newPayeeInputs[cs.id] || ''); }}
-                        style={{flex:1, border:'1px solid #ccd6f0', borderRadius:3, padding:'2px 6px', fontSize:11}}
-                      />
-                      <button onClick={() => addPayeeToFilter(cs.id, newPayeeInputs[cs.id] || '')}
-                        style={{padding:'2px 8px', fontSize:11, background:'#1a3a5c', color:'#fff', border:'none', borderRadius:3, cursor:'pointer'}}>Add</button>
-                    </div>
-                    {/* Split the calculated total between people (e.g. roommate pays half) */}
-                    <div style={{display:'flex', alignItems:'center', gap:8, marginTop:8, paddingTop:8, borderTop:'1px solid #dde6f5', flexWrap:'wrap'}}>
-                      <span style={{color:'#555', fontWeight:600}}>Split the total</span>
-                      <select value={splitWays} onChange={e => saveCatSum(cs.id, 'splitWays', e.target.value)}
-                        style={{border:'1px solid #ccd6f0', borderRadius:3, padding:'2px 6px', fontSize:11, color:'#555', cursor:'pointer'}}>
-                        <option value={1}>Off — full amount</option>
-                        <option value={2}>2 ways (half each)</option>
-                        <option value={3}>3 ways</option>
-                        <option value={4}>4 ways</option>
-                        <option value={5}>5 ways</option>
-                        <option value={6}>6 ways</option>
-                      </select>
-                      {splitWays > 1 && (
-                        <span style={{color:'#888'}}>each share: <span style={{color:'#1a3a5c', fontWeight:700}}>{FMT_USD(Math.abs(cs.net) / splitWays)}</span></span>
-                      )}
-                    </div>
-                  </div>
-                )}
+                <div className="lg-amt-col">
+                  <div className={`lg-amt ${cs.net < 0 ? 'neg' : 'pos'}`}>{FMT_USD_SIGNED(cs.net)}</div>
+                  {split > 1 && <div className="lg-sub">÷{split} = {FMT_USD(Math.abs(cs.net) / split)}</div>}
+                </div><Chev />
               </div>
             );
           })}
         </div>
+      </>}
 
-        {/* Credit Cards */}
-        <div className="card">
-          <div className="card-title" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <span>Credit Cards</span>
-            <button className="acct-add-btn" onClick={() => setAddingCard(v => !v)} title="Add a credit card">{addingCard ? '×' : '+'}</button>
-          </div>
-          {addingCard && (
-            <div className="acct-add-form">
-              <input autoFocus type="text" placeholder="short name (e.g. amex)" value={newCard.shortName}
-                onChange={e => setNewCard({ ...newCard, shortName: e.target.value })}
-                onKeyDown={e => { if (e.key === 'Enter') addCreditCard(); }} />
-              <input type="date" title="0% promo expiration (optional)" value={newCard.promoExpiry}
-                onChange={e => setNewCard({ ...newCard, promoExpiry: e.target.value })} />
-              <button onClick={addCreditCard}>Add</button>
+      {/* Credit cards */}
+      <div className="lg-sec"><span>Credit cards</span><button className="lg-add" onClick={() => setLsheet({ kind:'add', vals:{ type:'card', name:'', promo:'', amount:'', otherType:'asset' } })}>+ Add</button></div>
+      <div className="lg-card">
+        {creditCards.length === 0 && <div className="lg-empty">No credit cards yet.</div>}
+        {creditCards.map(cc => {
+          const b = ccBalances[cc.id] || { statement:0, activity:0, pending:0 };
+          return (
+            <div key={cc.id} className="lg-row" onClick={() => setLsheet({ kind:'card', id: cc.id, vals:{ name: cc.shortName, promo: cc.promoExpiry || '', apr: cc.apr != null ? String(cc.apr) : '' } })}>
+              <div className="lg-main">
+                <div className="lg-name">{cc.shortName}
+                  {cc.promoExpiry && <span className="lg-pill promo">0% {cc.promoExpiry.slice(5,7)}/{cc.promoExpiry.slice(2,4)}</span>}
+                  {cc.apr != null && <span className="lg-pill apr">{cc.apr}% apr</span>}
+                </div>
+                <div className="lg-meta">Stmt {FMT_USD(b.statement)} · Activity {FMT_USD(b.activity)} · Pending {FMT_USD(b.pending)}</div>
+              </div>
+              <div className="lg-amt">{FMT_USD(b.statement + b.activity + b.pending)}</div><Chev />
             </div>
-          )}
-          <table className="account-table">
-            <thead>
-              <tr><th>Account</th><th>Statement</th><th>Activity</th><th>Stmt + Activity</th><th>Pending</th><th>Total</th></tr>
-            </thead>
-            <tbody>
-              {creditCards.map(cc => {
-                const b = ccBalances[cc.id] || { statement:0, activity:0, pending:0 };
-                const total = b.statement + b.activity + b.pending;
-                return (
-                  <tr key={cc.id}>
-                    <td>
-                      <div style={{display:'flex', alignItems:'center', gap:6, minWidth:0}}>
-                        <InlineText editKey={`cc_name_${cc.id}`} value={cc.shortName} onSave={v => saveCardShortName(cc.id, v)} style={{color:'#1a3a5c'}} />
-                        {editField === `cc_promo_${cc.id}` ? (
-                          <span style={{display:'inline-flex', alignItems:'center', gap:4}}>
-                            <input type="date" className="edit-input" style={{width:150}} value={editVal}
-                              onChange={e => setEditVal(e.target.value)}
-                              onKeyDown={e => { if (e.key==='Enter') saveCardPromo(cc.id, editVal); if (e.key==='Escape') setEditField(null); }} />
-                            <button className="btn-save" onClick={() => saveCardPromo(cc.id, editVal)} title="Save promo date">✓</button>
-                            {cc.promoExpiry && <button className="btn-delete" onClick={() => saveCardPromo(cc.id, '')} title="Remove promo">✕</button>}
-                            <button className="btn-cancel" onClick={() => setEditField(null)} title="Cancel">↩</button>
-                          </span>
-                        ) : cc.promoExpiry ? (
-                          <span title="Tap to edit 0% promo expiry"
-                            onClick={() => { setEditField(`cc_promo_${cc.id}`); setEditVal(cc.promoExpiry); }}
-                            style={{fontSize:11, color:'#b85c00', padding:'1px 7px', border:'1px solid #f0d0a0', background:'#fff8ee', borderRadius:10, cursor:'pointer', whiteSpace:'nowrap'}}>0% {cc.promoExpiry.slice(5,7)}/{cc.promoExpiry.slice(2,4)}</span>
-                        ) : (
-                          <span title="Add a 0% promo expiry date"
-                            onClick={() => { setEditField(`cc_promo_${cc.id}`); setEditVal(''); }}
-                            style={{fontSize:11, color:'#aaa', padding:'1px 7px', border:'1px dashed #ccc', borderRadius:10, cursor:'pointer', whiteSpace:'nowrap'}}>+ promo</span>
-                        )}
-                        {editField === `cc_apr_${cc.id}` ? (
-                          <span style={{display:'inline-flex', alignItems:'center', gap:4}}>
-                            <input autoFocus type="number" step="0.01" min="0" placeholder="e.g. 21.99" className="edit-input" style={{width:90, textAlign:'right'}} value={editVal}
-                              onChange={e => setEditVal(e.target.value)}
-                              onKeyDown={e => { if (e.key==='Enter') saveCardApr(cc.id, editVal); if (e.key==='Escape') setEditField(null); }} />
-                            <button className="btn-save" onClick={() => saveCardApr(cc.id, editVal)} title="Save APR">✓</button>
-                            {cc.apr != null && <button className="btn-delete" onClick={() => saveCardApr(cc.id, '')} title="Remove APR">✕</button>}
-                            <button className="btn-cancel" onClick={() => setEditField(null)} title="Cancel">↩</button>
-                          </span>
-                        ) : cc.apr != null ? (
-                          <span title="Tap to edit APR"
-                            onClick={() => { setEditField(`cc_apr_${cc.id}`); setEditVal(String(cc.apr)); }}
-                            style={{fontSize:11, color:'#8a2be2', padding:'1px 7px', border:'1px solid #ddc8f0', background:'#faf5ff', borderRadius:10, cursor:'pointer', whiteSpace:'nowrap'}}>{cc.apr}% apr</span>
-                        ) : (
-                          <span title="Add the card's APR"
-                            onClick={() => { setEditField(`cc_apr_${cc.id}`); setEditVal(''); }}
-                            style={{fontSize:11, color:'#aaa', padding:'1px 7px', border:'1px dashed #ccc', borderRadius:10, cursor:'pointer', whiteSpace:'nowrap'}}>+ apr</span>
-                        )}
-                        <button className="acct-remove" style={{marginLeft:'auto'}} onClick={() => removeAccount(cc.id)} title="Remove this card from the list">×</button>
-                      </div>
-                    </td>
-                    <td>{FMT_USD(b.statement)}</td>
-                    <td>{FMT_USD(b.activity)}</td>
-                    <td>{FMT_USD(b.statement + b.activity)}</td>
-                    <td>{FMT_USD(b.pending)}</td>
-                    <td style={{fontWeight:700}}>{FMT_USD(total)}</td>
-                  </tr>
-                );
-              })}
-              <tr className="total-row">
-                <td>Total</td>
-                <td>{FMT_USD(creditCards.reduce((s,c)=>s+(ccBalances[c.id]?.statement||0),0))}</td>
-                <td>{FMT_USD(creditCards.reduce((s,c)=>s+(ccBalances[c.id]?.activity||0),0))}</td>
-                <td>{FMT_USD(creditCards.reduce((s,c)=>s+(ccBalances[c.id]?.statement||0)+(ccBalances[c.id]?.activity||0),0))}</td>
-                <td>{FMT_USD(creditCards.reduce((s,c)=>s+(ccBalances[c.id]?.pending||0),0))}</td>
-                <td>{FMT_USD(creditCards.reduce((s,c)=>s+(ccBalances[c.id]?.statement||0)+(ccBalances[c.id]?.activity||0)+(ccBalances[c.id]?.pending||0),0))}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* Cash Accounts — savings, second checking, etc. Spendable: they carry
-            ledger transactions and appear in the transaction account dropdown. */}
-        <div className="card">
-          <div className="card-title" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <span>Cash Accounts</span>
-            <button className="acct-add-btn" onClick={() => setAddingCash(v => !v)} title="Add a spendable cash account (savings, second checking…)">{addingCash ? '×' : '+'}</button>
-          </div>
-          {addingCash && (
-            <div className="acct-add-form">
-              <input autoFocus type="text" placeholder="short name (e.g. savings)" value={newCash.name}
-                onChange={e => setNewCash({ ...newCash, name: e.target.value })}
-                onKeyDown={e => { if (e.key === 'Enter') addCashAccount(); }} />
-              <input type="number" placeholder="balance" style={{width:90}} value={newCash.balance}
-                onChange={e => setNewCash({ ...newCash, balance: e.target.value })}
-                onKeyDown={e => { if (e.key === 'Enter') addCashAccount(); }} />
-              <button onClick={addCashAccount}>Add</button>
-            </div>
-          )}
-          {cashAccounts.length === 0 && !addingCash && (
-            <div style={{fontSize:12, color:'#999', padding:'4px 0'}}>No cash accounts yet — add savings or a second checking with +. They show up in the transaction account dropdown.</div>
-          )}
-          {cashAccounts.length > 0 && (
-            <table className="account-table">
-              <thead><tr><th>Account</th><th>Cleared</th><th>Current</th></tr></thead>
-              <tbody>
-                {cashAccounts.map(a => {
-                  const txns = data.transactions.filter(t => t.account === a.shortName);
-                  const unclearedDebits  = txns.filter(t => !t.cleared).reduce((s,t) => s + (t.debit  || 0), 0);
-                  const unclearedCredits = txns.filter(t => !t.cleared).reduce((s,t) => s + (t.credit || 0), 0);
-                  const cleared = (a.currentBalance || 0) - unclearedDebits + unclearedCredits;
-                  return (
-                    <tr key={a.id}>
-                      <td>
-                        <div style={{display:'flex', alignItems:'center', gap:6}}>
-                          <InlineText editKey={`cash_name_${a.id}`} value={a.shortName} onSave={v => saveCardShortName(a.id, v)} style={{color:'#1a3a5c'}} />
-                          <button className="acct-remove" style={{marginLeft:'auto'}} onClick={() => removeAccount(a.id)} title="Remove this account from the list">×</button>
-                        </div>
-                      </td>
-                      <td style={{color:'#555'}}>{FMT_USD(cleared)}</td>
-                      <td style={{fontWeight:700, color:'#1a3a5c'}}>
-                        <InlineNum editKey={`cash_bal_${a.id}`} value={a.currentBalance} onSave={v => saveCashBalance(a.id, v)} />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
-
-        {/* Other Accounts — vehicles, savings, loans, other assets & liabilities.
-            Manual balances (click to edit); each edit stamps a "last updated" date. */}
-        <div className="card">
-          <div className="card-title" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <span>Other Accounts</span>
-            <button className="acct-add-btn" onClick={() => setAddingOther(v => !v)} title="Add an asset or liability account">{addingOther ? '×' : '+'}</button>
-          </div>
-          {addingOther && (
-            <div className="acct-add-form">
-              <input autoFocus type="text" placeholder="name (e.g. savings, truck, HELOC)" value={newOther.name}
-                onChange={e => setNewOther({ ...newOther, name: e.target.value })}
-                onKeyDown={e => { if (e.key === 'Enter') addOtherAccount(); }} />
-              <select value={newOther.type} onChange={e => setNewOther({ ...newOther, type: e.target.value })}>
-                <option value="asset">asset</option>
-                <option value="liability">liability</option>
-              </select>
-              <input type="number" placeholder="balance" style={{width:90}} value={newOther.balance}
-                onChange={e => setNewOther({ ...newOther, balance: e.target.value })}
-                onKeyDown={e => { if (e.key === 'Enter') addOtherAccount(); }} />
-              <button onClick={addOtherAccount}>Add</button>
-            </div>
-          )}
-          <table className="account-table">
-            <thead>
-              <tr><th>Account</th><th>Type</th><th>Balance</th><th>Updated</th><th style={{width:30}} title="Include this account in the toggled total below">On</th></tr>
-            </thead>
-            <tbody>
-              {checking && (
-                <tr title="Lowest projected checking balance across the cashflow forecast — same as cell C1 on the Cashflow tab. Read-only; not added to the totals below.">
-                  <td style={{color:'#1a3a5c'}}>{checking.name || 'checking'} <span style={{fontSize:10, color:'#999'}}>(min projected)</span></td>
-                  <td style={{textAlign:'center'}}><span className="acct-type-badge asset" style={{cursor:'default'}}>asset</span></td>
-                  <td style={{fontWeight:700, color: cashflowMinBal >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD_SIGNED(cashflowMinBal)}{cashflowMinPeriod && <span style={{fontWeight:400, fontSize:11, opacity:0.7}}> ({cashflowMinPeriod.label})</span>}</td>
-                  <td style={{fontSize:10, color:'#999'}}>{checking.lastUpdated || '—'}</td>
-                  <td></td>
-                </tr>
-              )}
-              {otherAccounts.length === 0 && (
-                <tr><td colSpan={5} style={{color:'#aaa', fontStyle:'italic', fontWeight:400}}>No accounts yet — add savings, vehicles, loans…</td></tr>
-              )}
-              {otherAccounts.map(a => (
-                <tr key={a.id}>
-                  <td>
-                    <InlineText editKey={`oa_name_${a.id}`} value={a.name} onSave={v => saveOtherName(a.id, v)} style={{color:'#1a3a5c'}} />
-                    <button className="acct-remove" onClick={() => removeAccount(a.id)} title="Remove this account">×</button>
-                  </td>
-                  <td style={{textAlign:'center'}}>
-                    <button className={`acct-type-badge ${a.type}`} onClick={() => toggleAcctType(a.id)} title="Click to switch asset ↔ liability">{a.type}</button>
-                  </td>
-                  <td style={{fontWeight:700, color: a.type === 'liability' ? '#cc2200' : '#1a3a5c'}}>
-                    <InlineNum editKey={`oa_bal_${a.id}`} value={a.balance || 0} onSave={v => saveOtherBalance(a.id, v)} />
-                  </td>
-                  <td style={{fontSize:10, color:'#999'}}>{a.lastUpdated || '—'}</td>
-                  <td style={{textAlign:'center'}}>
-                    <input type="checkbox" checked={!!a.selected} onChange={() => toggleOtherSelected(a.id)} title="Include in toggled total below" />
-                  </td>
-                </tr>
-              ))}
-              {anyOtherSelected && (
-                <tr className="total-row" title="Sum of the accounts toggled on above (assets − liabilities)">
-                  <td>Toggled total</td>
-                  <td></td>
-                  <td colSpan={3} style={{color: otherSelectedNet >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD(otherSelectedNet)}</td>
-                </tr>
-              )}
-              {otherAccounts.length > 0 && (
-                <tr className="total-row">
-                  <td>Net (assets − liabilities)</td>
-                  <td></td>
-                  <td colSpan={3} style={{color: otherNet >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD(otherNet)}</td>
-                </tr>
-              )}
-              <tr className="total-row" title="Checking current balance + assets − liabilities − total credit card balances">
-                <td>Net worth</td>
-                <td></td>
-                <td colSpan={3} style={{color: netWorth >= 0 ? '#1a7a1a' : '#cc2200'}}>{FMT_USD(netWorth)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          );
+        })}
+        {creditCards.length > 0 && (
+          <div className="lg-total"><span>Total · stmt+activity {FMT_USD(ccTotals.s + ccTotals.a)}</span><b>{FMT_USD(ccTotalAll)}</b></div>
+        )}
       </div>
 
-      {/* Add Transaction */}
-      <div className="ledger-form">
-        <div style={{fontWeight:700, marginBottom:10, color:'#1a3a5c', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-          <span>Add Transaction</span>
+      {/* Cash accounts */}
+      <div className="lg-sec"><span>Cash accounts</span><button className="lg-add" onClick={() => setLsheet({ kind:'add', vals:{ type:'cash', name:'', promo:'', amount:'', otherType:'asset' } })}>+ Add</button></div>
+      <div className="lg-card">
+        {cashAccounts.length === 0 && <div className="lg-empty">Savings or a second checking — they show up as transaction accounts.</div>}
+        {cashAccounts.map(a => {
+          const tx = data.transactions.filter(t => t.account === a.shortName && !t.cleared);
+          const cleared = (a.currentBalance || 0) - tx.reduce((s,t) => s + (t.debit||0), 0) + tx.reduce((s,t) => s + (t.credit||0), 0);
+          return (
+            <div key={a.id} className="lg-row" onClick={() => setLsheet({ kind:'cash', id: a.id, vals:{ name: a.shortName, amount: String(a.currentBalance || 0) } })}>
+              <div className="lg-main">
+                <div className="lg-name">{a.shortName}</div>
+                <div className="lg-meta">Cleared {FMT_USD(cleared)} · updated {a.lastUpdated || '—'}</div>
+              </div>
+              <div className="lg-amt">{FMT_USD(a.currentBalance || 0)}</div><Chev />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Other accounts */}
+      <div className="lg-sec"><span>Other accounts</span><button className="lg-add" onClick={() => setLsheet({ kind:'add', vals:{ type:'other', name:'', promo:'', amount:'', otherType:'asset' } })}>+ Add</button></div>
+      <div className="lg-card">
+        {otherAccounts.length === 0 && <div className="lg-empty">Vehicles, loans, other assets & liabilities.</div>}
+        {otherAccounts.map(a => (
+          <div key={a.id} className="lg-row" onClick={() => setLsheet({ kind:'other', id: a.id, vals:{ name: a.name, type: a.type, amount: String(a.balance || 0), selected: !!a.selected } })}>
+            <button className={`lg-toggle ${a.selected ? 'on' : ''}`} title="Include in toggled total" onClick={e => { e.stopPropagation(); toggleOtherSelected(a.id); }}>{a.selected ? '✓' : ''}</button>
+            <div className="lg-main">
+              <div className="lg-name">{a.name} <span className={`lg-pill ${a.type}`}>{a.type}</span></div>
+              <div className="lg-meta">Updated {a.lastUpdated || '—'}</div>
+            </div>
+            <div className={`lg-amt ${a.type === 'liability' ? 'neg' : ''}`}>{a.type === 'liability' ? '−' : ''}{FMT_USD(a.balance || 0)}</div><Chev />
+          </div>
+        ))}
+        {anyOtherSelected && <div className="lg-total"><span>Toggled total</span><b className={otherSelectedNet < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(otherSelectedNet)}</b></div>}
+        {otherAccounts.length > 0 && <div className="lg-total"><span>Net (assets − liabilities)</span><b className={otherNet < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(otherNet)}</b></div>}
+      </div>
+
+      {/* Recent activity */}
+      {(lastAdded || lastCleared) && <>
+        <div className="lg-sec"><span>Recent</span></div>
+        <div className="lg-card">
           {lastAdded && (
-            <span style={{fontWeight:400, fontSize:12, color:'#8a6d1a', background:'#fdf6df', border:'1px solid #ecd9a0', borderRadius:4, padding:'2px 8px'}}
-              title="The most recent transaction you added — pick up from the next one on your statement">
-              Last added: <b>{displayDate(lastAdded.date)}</b> · {lastAdded.payee}
-              {lastAdded.debit ? <> · <span style={{color:'#cc2200'}}>{FMT_USD(lastAdded.debit)}</span></> : null}
-              {lastAdded.credit ? <> · <span style={{color:'#1a7a1a'}}>{FMT_USD(lastAdded.credit)}</span></> : null}
-              {' '}· {lastAdded.account}
-            </span>
+            <div className="lg-row" onClick={() => go({ account:'', search: lastAdded.payee || '' })}>
+              <div className="lg-main"><div className="lg-meta">Last added</div><div className="lg-name">{lastAdded.payee}</div><div className="lg-meta">{displayDate(lastAdded.date)} · {lastAdded.account}</div></div>
+              <div className={`lg-amt ${lastAdded.credit ? 'pos' : ''}`}>{lastAdded.credit ? '+' + FMT_USD(lastAdded.credit) : '−' + FMT_USD(lastAdded.debit || 0)}</div><Chev />
+            </div>
+          )}
+          {lastCleared && (
+            <div className="lg-row" onClick={() => go({ account:'', search: lastCleared.payee || '' })}>
+              <div className="lg-main"><div className="lg-meta">Last cleared</div><div className="lg-name">{lastCleared.payee || '(no payee)'}</div><div className="lg-meta">{displayDate(lastCleared.date)} · <span className={CLEARED_CLASS[lastCleared.cleared]||'cleared-blank'}>{CLEARED_LABEL[lastCleared.cleared]||'Uncleared'}</span></div></div>
+              <div className={`lg-amt ${lastCleared.credit ? 'pos' : ''}`}>{lastCleared.credit ? '+' + FMT_USD(lastCleared.credit) : '−' + FMT_USD(lastCleared.debit || 0)}</div><Chev />
+            </div>
           )}
         </div>
-        <div className="form-row">
-          <div className="form-group" style={{width:110}}>
-            <label>Date</label>
-            <input type="date" ref={dateInputRef} value={form.date} onChange={e=>setForm({...form,date:e.target.value})} />
-          </div>
-          <div className="form-group" style={{flex:2, minWidth:140}}>
-            <label>Payee</label>
-            <input type="text" value={form.payee} onChange={e=>setForm({...form,payee:e.target.value})} placeholder="payee name"
-              autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} />
-          </div>
-          <div className="form-group" style={{width:90}}>
-            <label>Debit</label>
-            <input type="number" value={form.debit} onChange={e=>setForm({...form,debit:e.target.value})} placeholder="0.00" />
-          </div>
-          <div className="form-group" style={{width:90}}>
-            <label>Credit</label>
-            <input type="number" value={form.credit} onChange={e=>setForm({...form,credit:e.target.value})} placeholder="0.00" />
-          </div>
-          <div className="form-group" style={{width:120}}>
-            <label>Category</label>
-            <input type="text" value={form.category} onChange={e=>setForm({...form,category:e.target.value})} placeholder="category" />
-          </div>
-          <div className="form-group" style={{width:44}}>
-            <label title="Subscription payment">Sub ↻</label>
-            <input type="checkbox" checked={!!form.sub} onChange={e=>setForm({...form,sub:e.target.checked})}
-              title="Check if this is a subscription payment" style={{height:21, width:16, margin:'0 auto'}} />
-          </div>
-          <div className="form-group" style={{width:130}}>
-            <label>Cleared</label>
-            <select value={form.cleared} onChange={e=>setForm({...form,cleared:e.target.value})}>
-              <option value="">Uncleared</option>
-              <option value="yes">Cleared</option>
-              <option value="cc activity">CC Activity</option>
-              <option value="cc pending">CC Pending</option>
-              <option value="cc statement">CC Statement</option>
-            </select>
-          </div>
-          <div className="form-group" style={{width:110}}>
-            <label>Account</label>
-            <select value={form.account} onChange={e=>setForm({...form,account:e.target.value})}>
-              {data.accounts.filter(a => a.shortName).map(a => <option key={a.id} value={a.shortName}>{a.shortName}</option>)}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>&nbsp;</label>
-            <button className="btn btn-primary" title="Add this transaction to the ledger" onClick={addTxn}>Add</button>
-          </div>
-          <div className="form-group" style={{flex:2, minWidth:120}}>
-            <label>Notes</label>
-            <input type="text" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="optional"
-              autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} />
-          </div>
-        </div>
+      </>}
+
+      {/* Data */}
+      <div className="lg-sec"><span>Data</span></div>
+      <div className="lg-card">
+        <button className="lg-link" onClick={() => go({ account:'' })}>All transactions ({data.transactions.length.toLocaleString()}) <Chev /></button>
+        <button className="lg-link" onClick={downloadBackup}>Download backup (JSON) <Chev /></button>
+        <button className="lg-link danger" onClick={truncateAll}>Clear all transactions…</button>
       </div>
+      <div style={{height:24}} />
 
-      </div>{/* end frozen top section */}
+      {lsheet && (
+        <div className="modal-overlay" onClick={() => setLsheet(null)}>
+          <div className="modal txs-sheet txe" onClick={e => e.stopPropagation()}>
+            <div className="txe-grab" />
+            <div className="txe-head">
+              <button className="txe-x" onClick={() => setLsheet(null)}>Cancel</button>
+              <div className="txe-title">{{ checking:'Checking Balance', card:'Credit Card', cash:'Cash Account', other:'Account', tracker:'Tracker', add:'Add Account' }[lsheet.kind]}</div>
+              <span style={{width:56}} />
+            </div>
 
-      {/* Drag handle — resize the frozen top section; double-click resets to default */}
-      {frozen && (
-        <div onPointerDown={startDragDivider} onDoubleClick={resetDivider}
-          title="Drag to resize the frozen section · double-click to reset"
-          style={{flexShrink:0, height:10, cursor:'ns-resize', touchAction:'none', background:'#e8e8e8',
-                  borderTop:'1px solid #ccc', borderBottom:'1px solid #ccc',
-                  display:'flex', alignItems:'center', justifyContent:'center', userSelect:'none'}}>
-          <div style={{width:44, height:4, borderRadius:2, background:'#aaa'}} />
+            {lsheet.kind === 'add' && (
+              <div className="txs-kind">
+                {[['card','Credit card'],['cash','Cash'],['other','Other']].map(([k,l]) => <button key={k} className={v.type===k?'on':''} onClick={() => setLV({type:k})}>{l}</button>)}
+              </div>
+            )}
+
+            {(lsheet.kind === 'card' || lsheet.kind === 'cash' || lsheet.kind === 'other' || lsheet.kind === 'add') && <>
+              <input className="txe-payee" placeholder={lsheet.kind === 'add' && v.type === 'other' ? 'Name (e.g. truck, HELOC)' : 'Short name (e.g. amex)'} value={v.name} onChange={e => setLV({name:e.target.value})} autoFocus={lsheet.kind === 'add'} />
+            </>}
+
+            {(lsheet.kind === 'checking' || lsheet.kind === 'cash' || lsheet.kind === 'other' || (lsheet.kind === 'add' && v.type !== 'card')) && <>
+              <div className="txe-label">{lsheet.kind === 'checking' ? 'Current balance' : 'Balance'}</div>
+              <label className="txe-amount">
+                <span className="txe-sign">$</span>
+                <input type="text" inputMode="decimal" placeholder="0.00" value={v.amount} autoFocus={lsheet.kind === 'checking'}
+                  style={{width: Math.max(4, (v.amount || '').length + 0.6) + 'ch'}}
+                  onFocus={e => e.target.select()} onChange={e => setLV({amount: cleanNum(e.target.value)})} />
+              </label>
+            </>}
+
+            {(lsheet.kind === 'other' || (lsheet.kind === 'add' && v.type === 'other')) && <>
+              <div className="txe-label">Type</div>
+              <div className="txs-kind">
+                {['asset','liability'].map(t => {
+                  const key = lsheet.kind === 'add' ? 'otherType' : 'type';
+                  return <button key={t} className={v[key]===t?'on':''} onClick={() => setLV({[key]:t})}>{t === 'asset' ? 'Asset' : 'Liability'}</button>;
+                })}
+              </div>
+              {lsheet.kind === 'other' && <label className="txs-check"><input type="checkbox" checked={v.selected} onChange={e => setLV({selected:e.target.checked})} /> Include in toggled total</label>}
+            </>}
+
+            {(lsheet.kind === 'card' || (lsheet.kind === 'add' && v.type === 'card')) && <>
+              <div className="txe-label">0% promo expires</div>
+              <div className="lg-inline">
+                <input className="txe-input" type="date" value={v.promo} onChange={e => setLV({promo:e.target.value})} />
+                {v.promo && <button className="lg-clear" onClick={() => setLV({promo:''})}>Clear</button>}
+              </div>
+              {lsheet.kind === 'card' && <>
+                <div className="txe-label">APR %</div>
+                <input className="txe-input" type="text" inputMode="decimal" placeholder="e.g. 21.99" value={v.apr} onChange={e => setLV({apr: cleanNum(e.target.value)})} />
+                {(() => { const b = ccBalances[lsheet.id] || {}; return (
+                  <div className="lg-breakdown">
+                    <div><span>Statement</span><b>{FMT_USD(b.statement||0)}</b></div>
+                    <div><span>Activity</span><b>{FMT_USD(b.activity||0)}</b></div>
+                    <div><span>Pending</span><b>{FMT_USD(b.pending||0)}</b></div>
+                  </div>); })()}
+              </>}
+            </>}
+
+            {lsheet.kind === 'checking' && (
+              <div className="lg-breakdown">
+                <div><span>Cleared balance</span><b>{FMT_USD(computedClearedBalance)}</b></div>
+                <div><span>Last updated</span><b>{WITH_YEAR(checking?.lastUpdated) || '—'}</b></div>
+              </div>
+            )}
+
+            {lsheet.kind === 'tracker' && <>
+              <input className="txe-payee" placeholder="Label" value={v.label} onChange={e => setLV({label:e.target.value})} />
+              <div className="txe-label">Date range</div>
+              <div className="lg-inline">
+                <input className="txe-input" type="date" value={v.from} onChange={e => setLV({from:e.target.value})} />
+                <span style={{color:'#aab'}}>–</span>
+                <input className="txe-input" type="date" value={v.to} onChange={e => setLV({to:e.target.value})} />
+              </div>
+              {(v.from || v.to) && <button className="txe-more" style={{marginTop:8}} onClick={() => setLV({from:'', to:''})}>Clear dates (all time)</button>}
+              <div className="txe-label">Payee filter</div>
+              <div className="txs-kind">
+                <button className={v.mode==='exclude'?'on':''} onClick={() => setLV({mode:'exclude'})}>Exclude</button>
+                <button className={v.mode==='include'?'on':''} onClick={() => setLV({mode:'include'})}>Include only</button>
+              </div>
+              <div className="txs-chips txe-chips">
+                {v.payees.map(p => <button key={p} className="txs-chip on" onClick={() => setLV({payees: v.payees.filter(x => x !== p)})}>{p} ×</button>)}
+                {v.payees.length === 0 && <span className="lg-meta">No payees — filter inactive</span>}
+              </div>
+              <div className="lg-inline">
+                <input className="txe-input" placeholder="Add payee (partial match ok)" value={v.newPayee} onChange={e => setLV({newPayee:e.target.value})}
+                  onKeyDown={e => { if (e.key === 'Enter') { const t = v.newPayee.trim(); if (t && !v.payees.some(p => p.toLowerCase() === t.toLowerCase())) setLV({payees:[...v.payees, t], newPayee:''}); } }} />
+                <button className="lg-clear" onClick={() => { const t = v.newPayee.trim(); if (t && !v.payees.some(p => p.toLowerCase() === t.toLowerCase())) setLV({payees:[...v.payees, t], newPayee:''}); }}>Add</button>
+              </div>
+              <div className="txe-label">Split the total</div>
+              <div className="txs-chips txe-chips">
+                {[1,2,3,4,5,6].map(n => <button key={n} className={`txs-chip ${String(n)===String(v.splitWays)?'on':''}`} onClick={() => setLV({splitWays:String(n)})}>{n === 1 ? 'Off' : `${n} ways`}</button>)}
+              </div>
+            </>}
+
+            <button className="txe-save" disabled={(lsheet.kind === 'add' || lsheet.kind === 'card' || lsheet.kind === 'cash') && !String(v.name || '').trim()} onClick={saveLsheet}>
+              {lsheet.kind === 'add' ? 'Add Account' : 'Save'}
+            </button>
+            {(lsheet.kind === 'card' || lsheet.kind === 'cash') && (
+              <button className="txe-more" style={{margin:'12px auto 0', display:'block'}} onClick={() => { const a = accounts.find(x => x.id === lsheet.id); setLsheet(null); go({ account: a?.shortName || '' }); }}>View transactions ›</button>
+            )}
+            {(lsheet.kind === 'card' || lsheet.kind === 'cash' || lsheet.kind === 'other') && (
+              <button className="txe-delete" onClick={() => removeFromSheet(lsheet.id)}>Remove account</button>
+            )}
+          </div>
         </div>
       )}
-
-      {/* Search bar + actions */}
-      <div style={Object.assign({padding:'8px 16px', background:'#f5f5f5', display:'flex', gap:8, alignItems:'center', flexWrap:'wrap'}, frozen ? {flexShrink:0} : {})}>
-        <input type="text" value={search} placeholder="Search payee, category, notes…"
-          onChange={e => { setSearch(e.target.value); setPage(1); }}
-          style={{flex:'1 1 200px', border:'1px solid #ccc', borderRadius:4, padding:'5px 8px', fontSize:13}} />
-        {lastCleared && (
-          <span
-            onClick={() => { setSearch(lastCleared.payee || ''); setPage(1); }}
-            title="Click to filter to this transaction"
-            style={{fontSize:11, padding:'3px 8px', border:'1px solid #9ab0d0', borderRadius:4, background:'#eef4fb', color:'#3a6090', cursor:'pointer', whiteSpace:'nowrap', fontWeight:600}}>
-            Last cleared: {lastCleared.payee || '(no payee)'} · {displayDate(lastCleared.date)} ·{' '}
-            <span className={CLEARED_CLASS[lastCleared.cleared]||'cleared-blank'} style={{fontWeight:700}}>{CLEARED_LABEL[lastCleared.cleared]||'—'}</span>
-          </span>
-        )}
-        <span style={{fontSize:12, color:'#666', whiteSpace:'nowrap'}}>
-          {txns.length < data.transactions.length
-            ? <>{txns.length.toLocaleString()} of {data.transactions.length.toLocaleString()}</>
-            : <>{data.transactions.length.toLocaleString()}</>
-          } txns · <span style={{color:'#cc2200'}}>{FMT_USD(totalDebit)}</span> · <span style={{color:'#1a7a1a'}}>{FMT_USD(totalCredit)}</span>
-        </span>
-        <button title={frozen ? 'Unfreeze top section (lets page scroll freely)' : 'Freeze top section (transactions scroll independently)'}
-          onClick={toggleFrozen}
-          style={{fontSize:11, padding:'4px 10px', border:`1px solid ${frozen ? '#7a9a5c' : '#9ab0d0'}`, borderRadius:4, background: frozen ? '#eef5e8' : '#f0f4fc', color: frozen ? '#3a6020' : '#3a6090', cursor:'pointer', fontWeight:600}}>
-          {frozen ? '🔒 Frozen' : '🔓 Unfrozen'}
-        </button>
-        <button title="Download a full JSON backup of all data" onClick={downloadBackup} style={{fontSize:11, padding:'4px 10px', border:'1px solid #9ab0d0', borderRadius:4, background:'#f0f4fc', color:'#3a6090', cursor:'pointer', fontWeight:600}}>⬇ Backup</button>
-        <button title="Permanently delete all transactions (prompts for backup first)" onClick={truncateAll} style={{fontSize:11, padding:'4px 10px', border:'1px solid #cc2200', borderRadius:4, background:'none', color:'#cc2200', cursor:'pointer', fontWeight:600}}>✕ Clear All</button>
-      </div>
-
-      {/* Transaction table — all rows, paginated */}
-      <div className="txn-wrap" style={frozen ? {flex:'1 1 0%', minHeight:180, display:'flex', flexDirection:'column', margin:'0 16px 8px'} : {margin:'0 16px 8px'}}>
-        <div style={frozen ? {overflowY:'auto', overflowX:'auto', flex:1} : {overflowX:'auto'}}>
-          <TransactionTable transactions={paged} onUpdate={updateTxn} onDelete={deleteTxn}
-            sortCol={sortCol} sortDir={sortDir} onSort={handleSort}
-            accounts={data.accounts} filters={colFilters} onFilterChange={onFilterChange}
-            highlightId={lastAddedId}
-            totals={{ count: txns.length, debit: totalDebit, credit: totalCredit }} />
-        </div>
-        <div className="pagination">
-          <button className="page-btn" onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}>‹ Prev</button>
-          {Array.from({length: Math.min(totalPages, 7)}, (_, i) => {
-            const p = totalPages <= 7 ? i+1 : (page <= 4 ? i+1 : (page >= totalPages-3 ? totalPages-6+i : page-3+i));
-            return <button key={p} className={`page-btn ${p === page ? 'active' : ''}`} onClick={() => setPage(p)}>{p}</button>;
-          })}
-          <button className="page-btn" onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}>Next ›</button>
-          <span style={{marginLeft:'auto'}}>
-            <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1); }}
-              style={{border:'1px solid #ccc', borderRadius:4, padding:'2px 6px', fontSize:12, cursor:'pointer'}}>
-              <option value={25}>25 / page</option>
-              <option value={50}>50 / page</option>
-              <option value={100}>100 / page</option>
-              <option value={250}>250 / page</option>
-            </select>
-          </span>
-        </div>
-      </div>
     </div>
   );
 }
@@ -3136,7 +3026,7 @@ function importCSV(text, data, setData) {
 // Uses the same transaction shape and localStorage keys as the Ledger screen.
 function TransactionsScreen({ data, setData }) {
   const acctShorts = useMemo(() => data.accounts.filter(a => a.shortName).map(a => a.shortName), [data.accounts]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => { const s0 = localStorage.getItem('pfm_txn_search_once') || ''; localStorage.removeItem('pfm_txn_search_once'); return s0; });
   const [acctFilter, setAcctFilter] = useState(() => localStorage.getItem('pfm_txn_acct') || '');
   const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('pfm_txn_status') || '');
   const [limit, setLimit] = useState(100);
@@ -3443,6 +3333,13 @@ function App() {
     return VALID_TABS.includes(saved) ? saved : 'cashflow';
   });
   function switchTab(t) { setTab(t); localStorage.setItem('pfm_active_tab', t); }
+  // Jump from the Ledger to the Transactions tab, pre-filtered
+  function openTxns({ account = '', search = '' } = {}) {
+    localStorage.setItem('pfm_txn_acct', account);
+    localStorage.setItem('pfm_txn_status', '');
+    if (search) localStorage.setItem('pfm_txn_search_once', search);
+    switchTab('transactions');
+  }
   const [data, setDataRaw] = useState(() => loadData());
   const [fileHandle, setFileHandle] = useState(null);
   const [fileStatus, setFileStatus] = useState('checking'); // checking | connected | none
@@ -3666,7 +3563,7 @@ function App() {
       {tab === 'cashflow'  && <CashflowScreen data={data} setData={setData} />}
       {tab === 'dashboard' && <DashboardScreen data={data} />}
       {tab === 'transactions' && <TransactionsScreen data={data} setData={setData} />}
-      {tab === 'ledger'    && <LedgerScreen data={data} setData={setData} />}
+      {tab === 'ledger'    && <LedgerScreen data={data} setData={setData} onOpenTxns={openTxns} />}
       <nav className="tabbar">
         {tabs.map(t => (
           <button key={t.id} className={`tabbar-btn ${tab===t.id?'active':''}`} onClick={()=>switchTab(t.id)}>

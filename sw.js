@@ -2,7 +2,7 @@
 // it never collides with the desktop app's own service worker one level up.
 // Bump CACHE whenever APP_VERSION (in this folder's index.html) changes so
 // phones pick up new versions.
-const CACHE = 'pfm-mobile-m2';
+const CACHE = 'pfm-mobile-m7';
 const ASSETS = [
   './',
   './index.html',

@@ -89,6 +89,9 @@
     .zero { color: #bbb; }
     .paid-dash { color: #1a7a1a; font-weight: 700; }
 
+    /* INCOME OVERRIDE — a period where the normal recurring amount was manually adjusted */
+    .override-cell { background: #e3edfb; color: #1a5ca8; font-weight: 700; }
+
     /* CARRYOVER — unpaid bills rolled in from an expired pay period */
     .carryover-cell { background: #fdebd0; color: #b45309; font-weight: 700; }
     .carryover-banner { background: #fff7e6; border: 1px solid #f0c36d; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: #7a5200; }
@@ -346,12 +349,77 @@
        pickers, payee filter) use small inline-styled inputs — bump them too
        so tapping one doesn't trigger iOS's jarring auto-zoom. */
     .card input, .card select { font-size: 16px !important; padding: 4px 6px !important; }
+    /* TRANSACTIONS TAB (mobile list) */
+    .txs-screen { padding: 0 !important; background: #f5f5f5; }
+    .txs-top { position: sticky; top: 0; z-index: 5; background: #f5f5f5; padding: 10px 12px 6px; border-bottom: 1px solid #e0e0e0; }
+    .txs-search { width: 100%; font-size: 16px; padding: 9px 12px; border: 1px solid #d0d0d0; border-radius: 10px; background: #fff; }
+    .txs-search:focus { outline: none; border-color: #1a5ca8; }
+    .txs-chips { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 8px; scrollbar-width: none; }
+    .txs-chips::-webkit-scrollbar { display: none; }
+    .txs-chip { flex-shrink: 0; border: 1px solid #c8d3e0; background: #fff; color: #1a3a5c; border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .txs-chip.on { background: #1a3a5c; border-color: #1a3a5c; color: #fff; }
+    .txs-summary { display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-top: 8px; }
+    .txs-out { color: #222; } .txs-in { color: #1a7a1a; }
+    .txs-group { padding: 0 12px; }
+    .txs-day { font-size: 11px; font-weight: 700; color: #777; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 4px 6px; }
+    .txs-list { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; }
+    .txs-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 1px solid #eee; cursor: pointer; }
+    .txs-row:first-child { border-top: none; }
+    .txs-row:active { background: #f2f6fb; }
+    .txs-dot { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #c8d3e0; background: #fff; color: #fff; font-size: 13px; font-weight: 700; line-height: 1; padding: 0; cursor: pointer; }
+    .txs-dot.on { background: #1a7a1a; border-color: #1a7a1a; }
+    .txs-main { flex: 1; min-width: 0; }
+    .txs-payee { font-size: 14px; font-weight: 600; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .txs-meta { font-size: 11px; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .txs-amt { flex-shrink: 0; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: #222; }
+    .txs-empty { text-align: center; color: #999; padding: 40px 12px; }
+    .txs-more { display: block; margin: 14px auto 0; background: #fff; border: 1px solid #c8d3e0; color: #1a3a5c; border-radius: 999px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .txs-fab { position: fixed; right: 18px; bottom: calc(var(--tabbar-h, 56px) + 16px); width: 54px; height: 54px; border-radius: 50%; border: none; background: #1a3a5c; color: #fff; font-size: 30px; line-height: 1; box-shadow: 0 4px 14px rgba(0,0,0,0.25); cursor: pointer; z-index: 50; }
+    .txs-sheet { max-height: 88dvh; overflow-y: auto; }
+    .txs-kind { display: flex; background: #eef1f5; border-radius: 8px; padding: 3px; margin-bottom: 14px; }
+    .txs-kind button { flex: 1; border: none; background: none; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #667; cursor: pointer; }
+    .txs-kind button.on { background: #fff; color: #1a3a5c; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .txs-two { display: flex; gap: 10px; } .txs-two > * { flex: 1; min-width: 0; }
+    .txs-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; }
+    /* ELEGANT ENTRY SHEET */
+    .txe { padding: 8px 18px calc(18px + env(safe-area-inset-bottom)) !important; max-height: 92dvh; }
+    .txe-grab { width: 38px; height: 5px; border-radius: 3px; background: #d6dbe2; margin: 0 auto 8px; }
+    .txe-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .txe-title { font-size: 15px; font-weight: 700; color: #1a3a5c; }
+    .txe-x { width: 56px; text-align: left; border: none; background: none; color: #1a5ca8; font-size: 15px; padding: 0; cursor: pointer; }
+    .txs-kind button.on.in { color: #1a7a1a; }
+    .txe-amount { display: flex; align-items: baseline; justify-content: center; gap: 4px; padding: 6px 0 14px; color: #222; cursor: text; }
+    .txe-amount.in { color: #1a7a1a; }
+    .txe-sign { font-size: 26px; font-weight: 600; opacity: 0.55; }
+    .txe-amount input { width: 7ch; min-width: 4ch; border: none; outline: none; background: none; font-size: 44px; font-weight: 700; color: inherit; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; padding: 0; text-align: left; }
+    .txe-amount input::placeholder { color: #c9cfd8; }
+    .txe-field { position: relative; }
+    .txe-payee { width: 100%; font-size: 18px !important; font-weight: 600; border: none; border-bottom: 2px solid #e3e7ec; padding: 10px 2px; outline: none; background: none; color: #222; }
+    .txe-payee:focus { border-bottom-color: #1a5ca8; }
+    .txe-sugg { margin-top: 6px; border: 1px solid #e3e7ec; border-radius: 10px; overflow: hidden; background: #fff; }
+    .txe-sugg button { display: flex; flex-direction: column; align-items: flex-start; width: 100%; border: none; border-top: 1px solid #f0f2f5; background: #fff; padding: 9px 12px; text-align: left; cursor: pointer; }
+    .txe-sugg button:first-child { border-top: none; }
+    .txe-sugg button:active { background: #f2f6fb; }
+    .txe-sugg-name { font-size: 14px; font-weight: 600; color: #222; }
+    .txe-sugg-meta { font-size: 11px; color: #8a94a3; margin-top: 1px; }
+    .txe-label { font-size: 11px; font-weight: 700; color: #8a94a3; text-transform: uppercase; letter-spacing: 0.06em; margin: 16px 0 2px; }
+    .txe-input { width: 100%; font-size: 16px; border: 1px solid #e3e7ec; border-radius: 10px; padding: 9px 12px; margin-top: 6px; outline: none; background: #fff; }
+    .txe-input:focus { border-color: #1a5ca8; }
+    .txe-chips { margin-top: 6px; flex-wrap: wrap; overflow: visible; }
+    .txe-datechip { position: relative; display: inline-flex; align-items: center; }
+    .txe-datechip input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+    .txe-more { display: block; margin-top: 16px; border: none; background: none; color: #1a5ca8; font-size: 14px; font-weight: 600; padding: 0; cursor: pointer; }
+    .txe-save { display: block; width: 100%; margin-top: 22px; border: none; border-radius: 14px; background: #1a3a5c; color: #fff; font-size: 16px; font-weight: 700; padding: 15px; cursor: pointer; }
+    .txe-save:disabled { background: #c9d2dd; cursor: default; }
+    .txe-delete { display: block; width: 100%; margin-top: 10px; border: none; background: none; color: #cc2200; font-size: 14px; font-weight: 600; padding: 8px; cursor: pointer; }
+    .txe-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabbar-h, 56px) + 84px); background: rgba(26,58,92,0.95); color: #fff; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 3000; white-space: nowrap; animation: txeIn .2s ease-out; }
+    @keyframes txeIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
   </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm2'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm7'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -677,6 +745,12 @@ function computeCashflowForecast(data, periods, today) {
       if (received) return 0;
     }
 
+    // Manual per-period override — takes priority over the frequency formula.
+    // Not for 'custom' rows, which are already fully per-period on their own.
+    if (item.frequency !== 'custom' && item.periodOverrides && Object.prototype.hasOwnProperty.call(item.periodOverrides, key)) {
+      return item.periodOverrides[key];
+    }
+
     // Optional active window — empty start = begins immediately, empty end = runs indefinitely
     if (item.startDate && new Date(item.startDate + 'T00:00:00') > period.end) return 0;
     if (item.endDate && new Date(item.endDate + 'T23:59:59') < period.start) return 0;
@@ -882,6 +956,12 @@ function computeCashflowForecast(data, periods, today) {
         return swchaseForecast.byPeriod[periodKey(period)] || 0;
       }
       return expenseInPeriod(item.dueDay, period) ? item.amount : 0;
+    }
+    if (item.type === 'one_time') {
+      // Lands only in the pay period containing the date, then never recurs
+      if (!item.onDate) return 0;
+      const d = new Date(item.onDate + 'T00:00:00');
+      return (d >= period.start && d <= period.end) ? item.amount : 0;
     }
     if (!expenseInPeriod(item.dueDay, period)) return 0;
     return item.amount;
@@ -1166,14 +1246,14 @@ function CashflowScreen({ data, setData }) {
   function openExpenseModal(item) {
     setExpenseEditItem(item);
     setAddingExpense(false);
-    setExpenseForm({ name: item.name, amount: item.amount ?? 0, type: item.type || 'fixed', dueDay: item.dueDay ?? '' });
+    setExpenseForm({ name: item.name, amount: item.amount ?? 0, type: item.type || 'fixed', dueDay: item.dueDay ?? '', onDate: item.onDate ?? '' });
   }
 
   function addExpenseRow() {
     const newItem = { id: `expense_${Date.now()}`, name: 'New expense', amount: 0, dueDay: null, type: 'fixed', status: 'active' };
     setExpenseEditItem(newItem);
     setAddingExpense(true);
-    setExpenseForm({ name: 'New expense', amount: 0, type: 'fixed', dueDay: '' });
+    setExpenseForm({ name: 'New expense', amount: 0, type: 'fixed', dueDay: '', onDate: '' });
   }
 
   function saveExpenseModal() {
@@ -1181,7 +1261,8 @@ function CashflowScreen({ data, setData }) {
     if (cfUndoStack.current.length > 30) cfUndoStack.current.shift();
     const hasDueDay = expenseForm.type === 'fixed' || expenseForm.type === 'debt_payoff';
     const patch = { name: expenseForm.name, amount: parseFloat(expenseForm.amount) || 0,
-      type: expenseForm.type, dueDay: hasDueDay ? (parseInt(expenseForm.dueDay) || null) : null };
+      type: expenseForm.type, dueDay: hasDueDay ? (parseInt(expenseForm.dueDay) || null) : null,
+      onDate: expenseForm.type === 'one_time' ? (expenseForm.onDate || null) : undefined };
     const newList = addingExpense
       ? [...data.cashflow.expenses, { ...expenseEditItem, ...patch }]
       : data.cashflow.expenses.map(e => e.id === expenseEditItem.id ? { ...e, ...patch } : e);
@@ -1288,6 +1369,15 @@ function CashflowScreen({ data, setData }) {
       cf.income = cf.income.map(i => i.id === id ? { ...i, [field]: parseFloat(editVal) || 0 } : i);
     } else if (section === 'customIncome') {
       cf.income = cf.income.map(i => i.id === id ? { ...i, customAmounts: { ...(i.customAmounts || {}), [field]: parseFloat(editVal) || 0 } } : i);
+    } else if (section === 'incomeOverride') {
+      // Blank input clears the override for that period, reverting to the normal formula amount
+      cf.income = cf.income.map(i => {
+        if (i.id !== id) return i;
+        const overrides = { ...(i.periodOverrides || {}) };
+        if (editVal.trim() === '') delete overrides[field];
+        else overrides[field] = parseFloat(editVal) || 0;
+        return { ...i, periodOverrides: overrides };
+      });
     } else if (section === 'deduction') {
       cf.deductions = cf.deductions.map(d => d.id === id ? { ...d, [field]: parseFloat(editVal) || 0 } : d);
     } else if (section === 'expense') {
@@ -1473,13 +1563,17 @@ function CashflowScreen({ data, setData }) {
                 <ECell section="income" id={item.id} field="amount" value={item.amount} display={item.amount > 0 ? FMT_USD(item.amount) : ''} className="amt num" />
                 <td className="due">{incomeDueLabel(item)}</td>
                 {periodData.map(({ period, incomeItems }) => {
+                  const pKey = periodKey(period);
                   const v = incomeItems.find(i => i.id === item.id)?.value || 0;
                   if (item.frequency === 'custom') {
-                    const pKey = periodKey(period);
                     const cls = ['num', isCurrentPeriod(period) ? 'col-current' : ''].filter(Boolean).join(' ');
                     return <ECell key={pKey} section="customIncome" id={item.id} field={pKey} value={item.customAmounts?.[pKey] ?? 0} display={v === 0 ? <span className="zero">—</span> : FMT_USD(v)} className={cls} />;
                   }
-                  return <Cell key={periodKey(period)} value={v} isCurrent={isCurrentPeriod(period)} />;
+                  const isOverridden = item.periodOverrides && Object.prototype.hasOwnProperty.call(item.periodOverrides, pKey);
+                  const cls = ['num', isCurrentPeriod(period) ? 'col-current' : '', isOverridden ? 'override-cell' : ''].filter(Boolean).join(' ');
+                  return <ECell key={pKey} section="incomeOverride" id={item.id} field={pKey} value={item.periodOverrides?.[pKey] ?? v}
+                    display={v === 0 ? <span className="zero">—</span> : FMT_USD(v)} className={cls}
+                    title={isOverridden ? 'Manually overridden for this period — click to change, clear the field to revert to the normal amount' : 'Click to override just this period'} />;
                 })}
               </tr>
             ))}
@@ -1546,6 +1640,8 @@ function CashflowScreen({ data, setData }) {
                       value={effDueDay} display={effDueDay || ''} className="due"
                       title="Due day of month for the fuchase payoff — click to edit" />;
                   })()
+                ) : item.type === 'one_time' ? (
+                  <td className="due" title={item.onDate ? `One-time — ${item.onDate}` : ''}>{fmtShortDate(item.onDate)}</td>
                 ) : (
                   <ECell section="expense" id={item.id} field="dueDay" value={item.dueDay}
                     display={item.dueDay || ''} className="due" />
@@ -1732,6 +1828,7 @@ function CashflowScreen({ data, setData }) {
                 onChange={e => setExpenseForm(f => ({...f, type: e.target.value}))}>
                 <option value="fixed">Fixed — monthly due date</option>
                 <option value="variable">Variable — no due date</option>
+                <option value="one_time">One-time — specific date</option>
               </select>
             </div>
 
@@ -1741,6 +1838,14 @@ function CashflowScreen({ data, setData }) {
                 <input type="number" min="1" max="31" value={expenseForm.dueDay}
                   onChange={e => setExpenseForm(f => ({...f, dueDay: e.target.value}))}
                   placeholder="e.g. 15" />
+              </div>
+            )}
+
+            {expenseForm.type === 'one_time' && (
+              <div className="modal-field">
+                <label>Date</label>
+                <input type="date" value={expenseForm.onDate || ''}
+                  onChange={e => setExpenseForm(f => ({...f, onDate: e.target.value}))} />
               </div>
             )}
 
@@ -2411,6 +2516,10 @@ function LedgerScreen({ data, setData }) {
     setData({ ...data, accounts: accounts.map(a => a.id === id ? { ...a, type: a.type === 'asset' ? 'liability' : 'asset' } : a) });
   }
 
+  function toggleOtherSelected(id) {
+    setData({ ...data, accounts: accounts.map(a => a.id === id ? { ...a, selected: !a.selected } : a) });
+  }
+
   function InlineNum({ editKey, value, onSave, style }) {
     if (editField === editKey) return (
       <input autoFocus className="edit-input" type="number" value={editVal}
@@ -2500,6 +2609,10 @@ function LedgerScreen({ data, setData }) {
   const otherAssetsTotal = otherAccounts.filter(a => a.type === 'asset').reduce((s, a) => s + (a.balance || 0), 0);
   const otherLiabTotal   = otherAccounts.filter(a => a.type === 'liability').reduce((s, a) => s + (a.balance || 0), 0);
   const otherNet = otherAssetsTotal - otherLiabTotal;
+  const otherSelectedAssetsTotal = otherAccounts.filter(a => a.type === 'asset' && a.selected).reduce((s, a) => s + (a.balance || 0), 0);
+  const otherSelectedLiabTotal   = otherAccounts.filter(a => a.type === 'liability' && a.selected).reduce((s, a) => s + (a.balance || 0), 0);
+  const otherSelectedNet = otherSelectedAssetsTotal - otherSelectedLiabTotal;
+  const anyOtherSelected = otherAccounts.some(a => a.selected);
   const ccTotalAll = creditCards.reduce((s, c) => { const b = ccBalances[c.id] || {}; return s + (b.statement || 0) + (b.activity || 0) + (b.pending || 0); }, 0);
   const cashTotalAll = cashAccounts.reduce((s, a) => s + (a.currentBalance || 0), 0);
   const netWorth = (checking?.currentBalance || 0) + cashTotalAll + otherNet - ccTotalAll;
@@ -2788,7 +2901,7 @@ function LedgerScreen({ data, setData }) {
           )}
           <table className="account-table">
             <thead>
-              <tr><th>Account</th><th>Type</th><th>Balance</th><th>Updated</th></tr>
+              <tr><th>Account</th><th>Type</th><th>Balance</th><th>Updated</th><th style={{width:30}} title="Include this account in the toggled total below">On</th></tr>
             </thead>
             <tbody>
               {checking && (
@@ -2797,10 +2910,11 @@ function LedgerScreen({ data, setData }) {
                   <td style={{textAlign:'center'}}><span className="acct-type-badge asset" style={{cursor:'default'}}>asset</span></td>
                   <td style={{fontWeight:700, color: cashflowMinBal >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD_SIGNED(cashflowMinBal)}{cashflowMinPeriod && <span style={{fontWeight:400, fontSize:11, opacity:0.7}}> ({cashflowMinPeriod.label})</span>}</td>
                   <td style={{fontSize:10, color:'#999'}}>{checking.lastUpdated || '—'}</td>
+                  <td></td>
                 </tr>
               )}
               {otherAccounts.length === 0 && (
-                <tr><td colSpan={4} style={{color:'#aaa', fontStyle:'italic', fontWeight:400}}>No accounts yet — add savings, vehicles, loans…</td></tr>
+                <tr><td colSpan={5} style={{color:'#aaa', fontStyle:'italic', fontWeight:400}}>No accounts yet — add savings, vehicles, loans…</td></tr>
               )}
               {otherAccounts.map(a => (
                 <tr key={a.id}>
@@ -2815,19 +2929,29 @@ function LedgerScreen({ data, setData }) {
                     <InlineNum editKey={`oa_bal_${a.id}`} value={a.balance || 0} onSave={v => saveOtherBalance(a.id, v)} />
                   </td>
                   <td style={{fontSize:10, color:'#999'}}>{a.lastUpdated || '—'}</td>
+                  <td style={{textAlign:'center'}}>
+                    <input type="checkbox" checked={!!a.selected} onChange={() => toggleOtherSelected(a.id)} title="Include in toggled total below" />
+                  </td>
                 </tr>
               ))}
+              {anyOtherSelected && (
+                <tr className="total-row" title="Sum of the accounts toggled on above (assets − liabilities)">
+                  <td>Toggled total</td>
+                  <td></td>
+                  <td colSpan={3} style={{color: otherSelectedNet >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD(otherSelectedNet)}</td>
+                </tr>
+              )}
               {otherAccounts.length > 0 && (
                 <tr className="total-row">
                   <td>Net (assets − liabilities)</td>
                   <td></td>
-                  <td colSpan={2} style={{color: otherNet >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD(otherNet)}</td>
+                  <td colSpan={3} style={{color: otherNet >= 0 ? '#1a3a5c' : '#cc2200'}}>{FMT_USD(otherNet)}</td>
                 </tr>
               )}
               <tr className="total-row" title="Checking current balance + assets − liabilities − total credit card balances">
                 <td>Net worth</td>
                 <td></td>
-                <td colSpan={2} style={{color: netWorth >= 0 ? '#1a7a1a' : '#cc2200'}}>{FMT_USD(netWorth)}</td>
+                <td colSpan={3} style={{color: netWorth >= 0 ? '#1a7a1a' : '#cc2200'}}>{FMT_USD(netWorth)}</td>
               </tr>
             </tbody>
           </table>
@@ -3006,9 +3130,314 @@ function importCSV(text, data, setData) {
   return txns.length;
 }
 
+// ─── TRANSACTIONS (mobile-first list) ───────────────────────────────────────
+// Phone-friendly view of every transaction: search, account/status chips,
+// grouped by date, tap a row to edit in a bottom sheet, + button to add.
+// Uses the same transaction shape and localStorage keys as the Ledger screen.
+function TransactionsScreen({ data, setData }) {
+  const acctShorts = useMemo(() => data.accounts.filter(a => a.shortName).map(a => a.shortName), [data.accounts]);
+  const [search, setSearch] = useState('');
+  const [acctFilter, setAcctFilter] = useState(() => localStorage.getItem('pfm_txn_acct') || '');
+  const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('pfm_txn_status') || '');
+  const [limit, setLimit] = useState(100);
+  const [sheet, setSheet] = useState(null); // null | { mode:'add'|'edit', id?, form }
+
+  function pickAcct(v) { setAcctFilter(v); localStorage.setItem('pfm_txn_acct', v); setLimit(100); }
+  function pickStatus(v) { setStatusFilter(v); localStorage.setItem('pfm_txn_status', v); setLimit(100); }
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return data.transactions.filter(t => {
+      if (acctFilter && t.account !== acctFilter) return false;
+      if (statusFilter === '__uncleared' && t.cleared) return false;
+      if (statusFilter && statusFilter !== '__uncleared' && t.cleared !== statusFilter) return false;
+      if (q) {
+        const hay = `${t.payee||''} ${t.category||''} ${t.notes||''} ${t.debit||''} ${t.credit||''}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    }).sort((a, b) => {
+      const c = parseDateForSort(b.date).localeCompare(parseDateForSort(a.date));
+      return c !== 0 ? c : String(b.id).localeCompare(String(a.id));
+    });
+  }, [data.transactions, search, acctFilter, statusFilter]);
+
+  const totals = useMemo(() => filtered.reduce((s, t) => ({ out: s.out + (t.debit || 0), inn: s.inn + (t.credit || 0) }), { out:0, inn:0 }), [filtered]);
+
+  const groups = useMemo(() => {
+    const out = [];
+    filtered.slice(0, limit).forEach(t => {
+      const key = parseDateForSort(t.date);
+      const last = out[out.length - 1];
+      if (last && last.key === key) last.items.push(t); else out.push({ key, items:[t] });
+    });
+    return out;
+  }, [filtered, limit]);
+
+  const categories = useMemo(() => {
+    const set = new Set();
+    data.transactions.forEach(t => { if (t.category) set.add(t.category); });
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [data.transactions]);
+
+  function dayLabel(iso) {
+    if (!iso || iso.length < 10) return iso || 'No date';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const [y, m, d] = iso.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    const diff = Math.round((today - dt) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return dt.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year: y === today.getFullYear() ? undefined : 'numeric' });
+  }
+
+  function openAdd() {
+    setShowMore(false);
+    const last = data.transactions.find(t => t.id === localStorage.getItem('pfm_last_added_txn'));
+    setSheet({ mode:'add', form: {
+      date: new Date().toLocaleDateString('en-CA'), payee:'', kind:'debit', amount:'',
+      account: acctFilter || last?.account || acctShorts[0] || '', cleared: last?.cleared || '',
+      category:'', notes:'', sub:false } });
+  }
+  function openEdit(t) {
+    setShowMore(false);
+    const isCredit = (t.credit || 0) > 0 && !(t.debit || 0);
+    setSheet({ mode:'edit', id: t.id, form: {
+      date: parseDateForSort(t.date), payee: t.payee || '', kind: isCredit ? 'credit' : 'debit',
+      amount: String(isCredit ? t.credit : (t.debit || '')), account: t.account || '', cleared: t.cleared || '',
+      category: t.category || '', notes: t.notes || '', sub: !!t.sub } });
+  }
+  function setF(changes) { setSheet(s => ({ ...s, form: { ...s.form, ...changes } })); }
+  const [payeeFocus, setPayeeFocus] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const [toast, setToast] = useState('');
+  const toastTimer = useRef(null);
+  function flash(msg) { setToast(msg); clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(''), 2200); }
+  // Payees ranked by most recent use, each with its latest transaction (for autofill)
+  const payeeIndex = useMemo(() => {
+    const m = new Map();
+    data.transactions.forEach(t => {
+      if (!t.payee) return;
+      const key = t.payee.trim().toLowerCase();
+      const d = parseDateForSort(t.date);
+      const cur = m.get(key);
+      if (!cur || d > cur.d || (d === cur.d && String(t.id) > String(cur.t.id))) m.set(key, { key, d, t });
+    });
+    return [...m.values()].sort((a, b) => b.d.localeCompare(a.d));
+  }, [data.transactions]);
+  // Most recently used categories, for one-tap chips
+  const recentCats = useMemo(() => {
+    const seen = new Set(), out = [];
+    for (const p of [...data.transactions].sort((a, b) => parseDateForSort(b.date).localeCompare(parseDateForSort(a.date)))) {
+      if (p.category && !seen.has(p.category)) { seen.add(p.category); out.push(p.category); if (out.length >= 8) break; }
+    }
+    return out;
+  }, [data.transactions]);
+  // Picking a known payee fills in its usual category, account and type
+  function pickPayee(p) {
+    const t = p.t;
+    const isCredit = (t.credit || 0) > 0 && !(t.debit || 0);
+    setF({ payee: t.payee, category: t.category || sheet.form.category, account: t.account || sheet.form.account, kind: isCredit ? 'credit' : 'debit' });
+    setPayeeFocus(false);
+  }
+
+  function saveSheet() {
+    const f = sheet.form;
+    if (!f.payee.trim() || (sheet.mode === 'add' && !(parseFloat(f.amount) > 0))) return;
+    const amt = parseFloat(f.amount) || 0;
+    const fields = { date: f.date, payee: f.payee.trim(), cleared: f.cleared,
+      debit: f.kind === 'debit' ? amt : 0, credit: f.kind === 'credit' ? amt : 0,
+      account: f.account, category: f.category.trim(), notes: f.notes, sub: !!f.sub };
+    if (sheet.mode === 'add') {
+      const txn = { id: Date.now().toString(), ...fields };
+      setData({ ...data, transactions: [...data.transactions, txn] });
+      localStorage.setItem('pfm_last_added_txn', txn.id);
+      flash(`Added ${txn.payee} ${txn.credit ? '+' : '−'}${FMT_USD(txn.credit || txn.debit)}`);
+    } else {
+      const prev = data.transactions.find(t => t.id === sheet.id);
+      // Same "last cleared" tracking the Ledger screen uses
+      if (prev && prev.cleared !== fields.cleared) localStorage.setItem('pfm_last_cleared_txn', sheet.id);
+      // Keep the original date string if the user didn't change the date
+      if (prev && parseDateForSort(prev.date) === fields.date) fields.date = prev.date;
+      setData({ ...data, transactions: data.transactions.map(t => t.id === sheet.id ? { ...t, ...fields } : t) });
+    }
+    setSheet(null);
+  }
+  function deleteSheet() {
+    if (!window.confirm('Delete this transaction?')) return;
+    setData({ ...data, transactions: data.transactions.filter(t => t.id !== sheet.id) });
+    setSheet(null);
+  }
+  // Tap the circle to toggle cleared without opening the editor.
+  // Checking → 'yes'; credit cards → 'cc pending' (matches the CC workflow).
+  function quickClear(e, t) {
+    e.stopPropagation();
+    const isCC = data.accounts.find(a => a.shortName === t.account)?.type === 'credit';
+    const next = t.cleared ? '' : (isCC ? 'cc pending' : 'yes');
+    localStorage.setItem('pfm_last_cleared_txn', t.id);
+    setData({ ...data, transactions: data.transactions.map(x => x.id === t.id ? { ...x, cleared: next } : x) });
+  }
+
+  const STATUS_CHIPS = [['', 'All'], ['__uncleared', 'Uncleared'], ['yes', 'Cleared'], ['cc pending', 'CC Pending'], ['cc activity', 'CC Activity'], ['cc statement', 'CC Statement']];
+  const f = sheet?.form;
+
+  return (
+    <div className="screen txs-screen">
+      <div className="txs-top">
+        <input className="txs-search" type="search" placeholder="Search payee, category, notes, amount" value={search} onChange={e => { setSearch(e.target.value); setLimit(100); }} />
+        <div className="txs-chips">
+          <button className={`txs-chip ${acctFilter===''?'on':''}`} onClick={() => pickAcct('')}>All accounts</button>
+          {acctShorts.map(s => <button key={s} className={`txs-chip ${acctFilter===s?'on':''}`} onClick={() => pickAcct(s)}>{s}</button>)}
+        </div>
+        <div className="txs-chips">
+          {STATUS_CHIPS.map(([v, l]) => <button key={v||'all'} className={`txs-chip ${statusFilter===v?'on':''}`} onClick={() => pickStatus(v)}>{l}</button>)}
+        </div>
+        <div className="txs-summary">
+          <span>{filtered.length.toLocaleString()} transactions</span>
+          <span><span className="txs-out">−{FMT_USD(totals.out)}</span> · <span className="txs-in">+{FMT_USD(totals.inn)}</span></span>
+        </div>
+      </div>
+
+      {groups.length === 0 && <div className="txs-empty">No transactions match.</div>}
+      {groups.map(g => (
+        <div key={g.key} className="txs-group">
+          <div className="txs-day">{dayLabel(g.key)}</div>
+          <div className="txs-list">
+            {g.items.map(t => {
+              const isCredit = (t.credit || 0) > 0 && !(t.debit || 0);
+              const amt = isCredit ? t.credit : (t.debit || 0);
+              return (
+                <div key={t.id} className="txs-row" onClick={() => openEdit(t)}>
+                  <button className={`txs-dot ${t.cleared ? 'on' : ''}`} title={t.cleared ? 'Mark uncleared' : 'Mark cleared'} onClick={e => quickClear(e, t)}>{t.cleared ? '✓' : ''}</button>
+                  <div className="txs-main">
+                    <div className="txs-payee">{t.payee || '(no payee)'}</div>
+                    <div className="txs-meta">
+                      {[t.category, t.account].filter(Boolean).join(' · ')}
+                      {' '}<span className={CLEARED_CLASS[t.cleared] || 'cleared-blank'}>{t.cleared ? CLEARED_LABEL[t.cleared] || t.cleared : 'Uncleared'}</span>
+                    </div>
+                  </div>
+                  <div className={`txs-amt ${isCredit ? 'txs-in' : ''}`}>{isCredit ? '+' : '−'}{FMT_USD(amt)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      {filtered.length > limit && (
+        <button className="txs-more" onClick={() => setLimit(l => l + 100)}>Show more ({(filtered.length - limit).toLocaleString()} left)</button>
+      )}
+      <div style={{height:80}} />
+
+      <button className="txs-fab" title="Add transaction" onClick={openAdd}>+</button>
+
+      {sheet && (() => {
+        const acctType = data.accounts.find(a => a.shortName === f.account)?.type;
+        const clearedOpts = acctType === 'credit' ? ['', 'cc pending', 'cc activity', 'cc statement'] : ['', 'yes'];
+        if (f.cleared && !clearedOpts.includes(f.cleared)) clearedOpts.push(f.cleared);
+        const todayIso = new Date().toLocaleDateString('en-CA');
+        const yd = new Date(); yd.setDate(yd.getDate() - 1); const yIso = yd.toLocaleDateString('en-CA');
+        const q = f.payee.trim().toLowerCase();
+        const suggestions = payeeFocus ? payeeIndex.filter(p => p.key !== q && (!q || p.key.includes(q))).slice(0, 5) : [];
+        const amtNum = parseFloat(f.amount) || 0;
+        const canSave = f.payee.trim() && (amtNum > 0 || sheet.mode === 'edit');
+        return (
+        <div className="modal-overlay" onClick={() => setSheet(null)}>
+          <div className="modal txs-sheet txe" onClick={e => e.stopPropagation()}>
+            <div className="txe-grab" />
+            <div className="txe-head">
+              <button className="txe-x" onClick={() => setSheet(null)}>Cancel</button>
+              <div className="txe-title">{sheet.mode === 'add' ? 'New Transaction' : 'Edit Transaction'}</div>
+              <span style={{width:56}} />
+            </div>
+
+            <div className="txs-kind">
+              <button className={f.kind==='debit'?'on':''} onClick={() => setF({kind:'debit'})}>Expense</button>
+              <button className={f.kind==='credit'?'on in':''} onClick={() => setF({kind:'credit'})}>Income / Payment</button>
+            </div>
+
+            <label className={`txe-amount ${f.kind==='credit'?'in':''}`}>
+              <span className="txe-sign">{f.kind==='credit' ? '+' : '−'}$</span>
+              <input type="text" inputMode="decimal" placeholder="0.00" value={f.amount} autoFocus={sheet.mode==='add'} style={{width: Math.max(4, (f.amount || '').length + 0.6) + 'ch'}}
+                onChange={e => setF({amount: e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')})} />
+            </label>
+
+            <div className="txe-field">
+              <input className="txe-payee" placeholder="Payee" value={f.payee}
+                onFocus={() => setPayeeFocus(true)} onBlur={() => setTimeout(() => setPayeeFocus(false), 150)}
+                onChange={e => setF({payee:e.target.value})} />
+              {suggestions.length > 0 && (
+                <div className="txe-sugg">
+                  {suggestions.map(p => (
+                    <button key={p.key} onMouseDown={e => e.preventDefault()} onClick={() => pickPayee(p)}>
+                      <span className="txe-sugg-name">{p.t.payee}</span>
+                      <span className="txe-sugg-meta">{[p.t.category, p.t.account].filter(Boolean).join(' · ')} · {FMT_USD((p.t.debit||0) || (p.t.credit||0))}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="txe-label">Category</div>
+            <input className="txe-input" list="txs-cats" placeholder="Category" value={f.category} onChange={e => setF({category:e.target.value})} />
+            <datalist id="txs-cats">{categories.map(c => <option key={c} value={c} />)}</datalist>
+            {recentCats.length > 0 && (
+              <div className="txs-chips txe-chips">
+                {recentCats.map(c => <button key={c} className={`txs-chip ${f.category===c?'on':''}`} onClick={() => setF({category: f.category===c ? '' : c})}>{c}</button>)}
+              </div>
+            )}
+
+            <div className="txe-label">Date</div>
+            <div className="txs-chips txe-chips">
+              <button className={`txs-chip ${f.date===todayIso?'on':''}`} onClick={() => setF({date:todayIso})}>Today</button>
+              <button className={`txs-chip ${f.date===yIso?'on':''}`} onClick={() => setF({date:yIso})}>Yesterday</button>
+              <label className={`txs-chip txe-datechip ${f.date!==todayIso && f.date!==yIso?'on':''}`}>
+                {f.date!==todayIso && f.date!==yIso && f.date ? displayDate(f.date) : 'Pick date…'}
+                <input type="date" value={f.date} onChange={e => e.target.value && setF({date:e.target.value})} />
+              </label>
+            </div>
+
+            <div className="txe-label">Account</div>
+            <div className="txs-chips txe-chips">
+              {(f.account && !acctShorts.includes(f.account) ? [f.account, ...acctShorts] : acctShorts).map(s => (
+                <button key={s} className={`txs-chip ${f.account===s?'on':''}`} onClick={() => {
+                  const t = data.accounts.find(a => a.shortName === s)?.type;
+                  const ok = t === 'credit' ? ['', 'cc pending', 'cc activity', 'cc statement'] : ['', 'yes'];
+                  setF({account:s, cleared: ok.includes(f.cleared) ? f.cleared : ''});
+                }}>{s}</button>
+              ))}
+            </div>
+
+            <div className="txe-label">Status</div>
+            <div className="txs-chips txe-chips">
+              {clearedOpts.map(o => <button key={o||'blank'} className={`txs-chip ${f.cleared===o?'on':''}`} onClick={() => setF({cleared:o})}>{o ? CLEARED_LABEL[o] || o : 'Uncleared'}</button>)}
+            </div>
+
+            {!showMore && !f.notes && !f.sub
+              ? <button className="txe-more" onClick={() => setShowMore(true)}>+ Notes & more</button>
+              : <>
+                  <div className="txe-label">Notes</div>
+                  <input className="txe-input" placeholder="Optional" value={f.notes} onChange={e => setF({notes:e.target.value})} />
+                  <label className="txs-check" style={{marginTop:10}}><input type="checkbox" checked={f.sub} onChange={e => setF({sub:e.target.checked})} /> Sub</label>
+                </>}
+
+            <button className="txe-save" disabled={!canSave} onClick={saveSheet}>
+              {sheet.mode === 'add'
+                ? (canSave ? `Add ${f.kind==='credit'?'+':'−'}${FMT_USD(amtNum)}` : 'Enter amount & payee')
+                : 'Save Changes'}
+            </button>
+            {sheet.mode === 'edit' && <button className="txe-delete" onClick={deleteSheet}>Delete transaction</button>}
+          </div>
+        </div>
+        );
+      })()}
+      {toast && <div className="txe-toast">{toast}</div>}
+    </div>
+  );
+}
+
 // ─── APP ROOT ───────────────────────────────────────────────────────────────
 function App() {
-  const VALID_TABS = ['cashflow', 'ledger', 'dashboard'];
+  const VALID_TABS = ['cashflow', 'transactions', 'ledger', 'dashboard'];
   const [tab, setTab] = useState(() => {
     const saved = localStorage.getItem('pfm_active_tab');
     return VALID_TABS.includes(saved) ? saved : 'cashflow';
@@ -3173,6 +3602,7 @@ function App() {
 
   const tabs = [
     { id:'cashflow', label:'Cashflow' },
+    { id:'transactions', label:'Transactions' },
     { id:'ledger', label:'Ledger' },
     { id:'dashboard', label:'Dashboard' },
   ];
@@ -3181,6 +3611,7 @@ function App() {
   const TAB_ICONS = {
     cashflow: <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7" /><polyline points="15 7 21 7 21 13" /></svg>,
     ledger: <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>,
+    transactions: <svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="9" y1="12" x2="15" y2="12" /></svg>,
     dashboard: <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg>,
   };
   const [showMenu, setShowMenu] = useState(false);
@@ -3234,6 +3665,7 @@ function App() {
       )}
       {tab === 'cashflow'  && <CashflowScreen data={data} setData={setData} />}
       {tab === 'dashboard' && <DashboardScreen data={data} />}
+      {tab === 'transactions' && <TransactionsScreen data={data} setData={setData} />}
       {tab === 'ledger'    && <LedgerScreen data={data} setData={setData} />}
       <nav className="tabbar">
         {tabs.map(t => (

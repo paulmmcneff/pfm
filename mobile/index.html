@@ -463,7 +463,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm9'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm11'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -648,6 +648,27 @@ function namesMatch(expenseName, payee) {
 
 // Net worth from raw data: checking + assets − liabilities − credit card
 // balances (cards computed from ledger transactions, same as the Ledger panel).
+// ─── SPECIAL EXPENSE ROLES ───────────────────────────────────────────────────
+// A few cashflow rows get computed behavior. They're recognized by a generic
+// id pattern + shape (or an explicit item.role), never by a card's name:
+//   promo_payoff  — debt_payoff row "*_monthly" with a deadline: remaining balance
+//                   split into equal monthly payments through the deadline
+//   promo_due     — debt_payoff row "*_promo" with a deadline: supplies the due day
+//   card_payment  — debt_payoff row "*_payment" whose name matches a credit card:
+//                   amount = that card's live statement balance from the ledger
+function expenseRole(item, accounts) {
+  if (!item) return null;
+  if (item.role) return item.role;
+  if (item.type !== 'debt_payoff') return null;
+  const id = item.id || '';
+  if (item.deadline && /_monthly$/.test(id)) return 'promo_payoff';
+  if (item.deadline && /_promo$/.test(id)) return 'promo_due';
+  if (!item.deadline && /_payment$/.test(id) &&
+      (accounts || []).some(a => a.type === 'credit' && namesMatch(item.ledgerMatch || item.name, a.shortName))) return 'card_payment';
+  return null;
+}
+function findRole(cf, accounts, role) { return (cf.expenses || []).find(e => expenseRole(e, accounts) === role) || null; }
+
 function computeNetWorthParts(data) {
   const accounts = data.accounts || [];
   const checking = accounts.find(a => a.type === 'checking');
@@ -823,13 +844,13 @@ function computeCashflowForecast(data, periods, today) {
     return 0;
   }
 
-  // fuchase payoff schedule: split the remaining balance into equal payments,
+  // Promo payoff schedule: split the remaining balance into equal payments,
   // one on each remaining monthly due date (due day comes from the promo row)
   // through the deadline, and place each payment in the pay period containing it
-  const fuchaseSchedule = (() => {
-    const item = cf.expenses.find(e => e.id === 'fuchase_monthly');
+  const payoffSchedule = (() => {
+    const item = findRole(cf, data.accounts, 'promo_payoff');
     if (!item || item.status === 'paid_off' || !(item.remainingBalance > 0) || periods.length === 0) return { byPeriod: {}, count: 0, perPayment: 0 };
-    const promo = cf.expenses.find(e => e.id === 'fuchase_promo');
+    const promo = findRole(cf, data.accounts, 'promo_due');
     const dueDay = promo?.dueDay || item.dueDay || 1;
     const deadline = item.deadline ? new Date(item.deadline + 'T23:59:59') : periods[periods.length - 1].end;
     const from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -858,15 +879,15 @@ function computeCashflowForecast(data, periods, today) {
     return { byPeriod, count: dates.length, perPayment: per };
   })();
 
-  // swchase forecast: always two upcoming entries, computed live from the ledger —
+  // card-payment forecast: always two upcoming entries, computed live from the ledger —
   //  1) the current statement balance, due on the next monthly due date
   //  2) cc activity + cc pending (the charges that will form the next statement),
   //     due in the pay period containing the following month's due date
-  const swchaseForecast = (() => {
-    const item = cf.expenses.find(e => e.id === 'swchase_payment');
+  const cardPayForecast = (() => {
+    const item = findRole(cf, data.accounts, 'card_payment');
     if (!item || item.status === 'paid_off' || periods.length === 0) return { byPeriod: {}, statement: 0, upcoming: 0 };
     const acct = data.accounts.find(a => a.type === 'credit' && namesMatch(item.ledgerMatch || item.name, a.shortName));
-    const txns = data.transactions.filter(t => t.account === (acct?.shortName || 'swchase'));
+    const txns = data.transactions.filter(t => t.account === (acct?.shortName || normName(item.ledgerMatch || item.name)));
     const sum = c => txns.filter(t => t.cleared === c).reduce((s, t) => s + (t.debit || 0) - (t.credit || 0), 0);
     const statement = Math.round(sum('cc statement') * 100) / 100;
     const upcoming  = Math.round((sum('cc activity') + sum('cc pending')) * 100) / 100;
@@ -904,7 +925,7 @@ function computeCashflowForecast(data, periods, today) {
       if (!(t.debit > 0)) return false;
       const d = parseDateForSort(t.date);
       if (d < pStart || d > pEnd) return false;
-      // Fixed bills also match on category (e.g. payee "las casitas", category
+      // Fixed bills also match on category (e.g. payee "sunrise apartments", category
       // "hoa"). Variable budgets stay payee-only — otherwise one categorized
       // charge would zero out the whole period's budget.
       return namesMatch(matchName, t.payee) || (!!item.dueDay && namesMatch(matchName, t.category));
@@ -935,11 +956,11 @@ function computeCashflowForecast(data, periods, today) {
     const byExpense = {}, entries = [], skippedEntries = [], absorbedEntries = [];
     for (const item of cf.expenses) {
       // Only fixed bills with a real due day and amount are "owed" — variable
-      // budgets reset each period, and the fuchase/swchase payoff schedules
+      // budgets reset each period, and the promo-payoff / card-payment rows
       // already self-heal by recomputing from today's remaining balance.
       if (!item.dueDay || !(item.amount > 0)) continue;
       if (item.status === 'paid_off') continue;
-      if (['fuchase_monthly', 'fuchase_promo', 'swchase_payment'].includes(item.id)) continue;
+      if (expenseRole(item, data.accounts)) continue;
       // Chronological list of due instances inside the window
       const instances = [];
       for (const p of expired) if (expenseInPeriod(item.dueDay, p)) instances.push({ period: p, expired: true });
@@ -990,14 +1011,14 @@ function computeCashflowForecast(data, periods, today) {
   function getExpenseValue(item, period) {
     if (item.type === 'debt_payoff') {
       if (item.status === 'paid_off') return 0;
-      if (item.id === 'fuchase_monthly') {
+      if (expenseRole(item, data.accounts) === 'promo_payoff') {
         // Scheduled equal payments on real due dates through the deadline
-        return fuchaseSchedule.byPeriod[periodKey(period)] || 0;
+        return payoffSchedule.byPeriod[periodKey(period)] || 0;
       }
-      if (item.id === 'swchase_payment') {
+      if (expenseRole(item, data.accounts) === 'card_payment') {
         // Two live entries from the ledger: statement at the next due date,
         // activity + pending at the due date after that
-        return swchaseForecast.byPeriod[periodKey(period)] || 0;
+        return cardPayForecast.byPeriod[periodKey(period)] || 0;
       }
       return expenseInPeriod(item.dueDay, period) ? item.amount : 0;
     }
@@ -1054,7 +1075,7 @@ function computeCashflowForecast(data, periods, today) {
   const minIdx = periodData.reduce((best, d, i) => d.endBal < periodData[best].endBal ? i : best, 0);
   const minBal = periodData.length ? periodData[minIdx].endBal : 0;
   const minPeriod = periodData.length ? periodData[minIdx].period : null;
-  return { periodData, minBal, minPeriod, fuchaseSchedule, swchaseForecast, carryRecon };
+  return { periodData, minBal, minPeriod, payoffSchedule, cardPayForecast, carryRecon };
 }
 
 // ─── CASHFLOW SCREEN ────────────────────────────────────────────────────────
@@ -1072,7 +1093,7 @@ function CashflowScreen({ data, setData }) {
     return () => clearTimeout(t);
   }, [today]);
 
-  const { periodData, minBal, minPeriod, fuchaseSchedule, swchaseForecast, carryRecon } =
+  const { periodData, minBal, minPeriod, payoffSchedule, cardPayForecast, carryRecon } =
     useMemo(() => computeCashflowForecast(data, periods, today), [data, periods, today]);
   const isCurrentPeriod = (period) => period.start <= today && today <= period.end;
 
@@ -1481,7 +1502,7 @@ function CashflowScreen({ data, setData }) {
     if (item.style === 'income_tracked') return 'row-income-tracked';
     if (item.style === 'deduction') return 'row-deduction';
     if (item.type === 'debt_payoff' && item.status === 'payoff_in_progress') return 'row-highlight-yellow';
-    if (item.type === 'debt_payoff' && item.id === 'fuchase_monthly') return 'row-highlight-blue';
+    if (item.type === 'debt_payoff' && expenseRole(item, data.accounts) === 'promo_payoff') return 'row-highlight-blue';
     return 'row-expense';
   };
 
@@ -1649,40 +1670,40 @@ function CashflowScreen({ data, setData }) {
                 {idx === 0 && <td className="sec-label sec-label-expense" rowSpan={cf.expenses.length + cf.goals.length + 1}><span>expenses</span><button className="sec-label-add" onClick={e => { e.stopPropagation(); addExpenseRow(); }} title="Add expense row">+</button><button className="sec-label-add" onClick={e => { e.stopPropagation(); sortSection('expenses'); }} title={`Sort expenses by ${SORT_MODE_LABELS[nextSortMode('expenses')]} — due-dated bills stay above variable expenses`}>⇅</button></td>}
                 <td className="label expense-label" onClick={() => openExpenseModal(item)}>
                   {item.name}
-                  {item.id === 'fuchase_monthly' && fuchaseSchedule.count > 0 && (
-                    <span className="payments-left-badge" title="Payments remaining — computed from the remaining balance and monthly due dates through the payoff deadline">{fuchaseSchedule.count} left</span>
+                  {expenseRole(item, data.accounts) === 'promo_payoff' && payoffSchedule.count > 0 && (
+                    <span className="payments-left-badge" title="Payments remaining — computed from the remaining balance and monthly due dates through the payoff deadline">{payoffSchedule.count} left</span>
                   )}
                   <span className="expense-edit-hint">⚙</span>
                 </td>
-                {item.id === 'fuchase_promo' ? (
-                  /* c21: remaining account balance (edits fuchase_monthly.remainingBalance — the schedule's source) */
-                  <ECell section="expense" id="fuchase_monthly" field="remainingBalance"
-                    value={cf.expenses.find(e => e.id === 'fuchase_monthly')?.remainingBalance || 0}
-                    display={FMT_USD(cf.expenses.find(e => e.id === 'fuchase_monthly')?.remainingBalance || 0)}
+                {expenseRole(item, data.accounts) === 'promo_due' ? (
+                  /* c21: remaining account balance (edits the promo_payoff row's remainingBalance — the schedule's source) */
+                  <ECell section="expense" id={findRole(cf, data.accounts, 'promo_payoff')?.id} field="remainingBalance"
+                    value={findRole(cf, data.accounts, 'promo_payoff')?.remainingBalance || 0}
+                    display={FMT_USD(findRole(cf, data.accounts, 'promo_payoff')?.remainingBalance || 0)}
                     className="amt num" />
-                ) : item.id === 'fuchase_monthly' ? (
+                ) : expenseRole(item, data.accounts) === 'promo_payoff' ? (
                   /* c22: per-payment amount = remaining balance ÷ payments left (computed, not editable) */
                   <td className="amt num" title="Remaining balance ÷ payments left">
-                    {fuchaseSchedule.perPayment ? FMT_USD(fuchaseSchedule.perPayment) : ''}
+                    {payoffSchedule.perPayment ? FMT_USD(payoffSchedule.perPayment) : ''}
                   </td>
-                ) : item.id === 'swchase_payment' ? (
+                ) : expenseRole(item, data.accounts) === 'card_payment' ? (
                   /* statement balance from the ledger; next month's entry = activity + pending */
-                  <td className="amt num" title={`Statement ${FMT_USD(swchaseForecast.statement)} at next due date · activity + pending ${FMT_USD(swchaseForecast.upcoming)} at the following due date — both live from the ledger`}>
-                    {swchaseForecast.statement ? FMT_USD(swchaseForecast.statement) : ''}
+                  <td className="amt num" title={`Statement ${FMT_USD(cardPayForecast.statement)} at next due date · activity + pending ${FMT_USD(cardPayForecast.upcoming)} at the following due date — both live from the ledger`}>
+                    {cardPayForecast.statement ? FMT_USD(cardPayForecast.statement) : ''}
                   </td>
                 ) : (
                   <ECell section="expense" id={item.id} field="amount" value={item.amount} display={item.amount > 0 ? FMT_USD(item.amount) : ''} className="amt num" />
                 )}
-                {item.id === 'fuchase_monthly' ? (
+                {expenseRole(item, data.accounts) === 'promo_payoff' ? (
                   /* d22: payoff due day of month. The schedule reads the promo row's dueDay
                      first, so edit that row when it exists — mirrors how the promo amount
-                     cell edits fuchase_monthly.remainingBalance. */
+                     cell edits the promo_payoff row's remainingBalance. */
                   (() => {
-                    const promo = cf.expenses.find(e => e.id === 'fuchase_promo');
+                    const promo = findRole(cf, data.accounts, 'promo_due');
                     const effDueDay = promo?.dueDay || item.dueDay;
-                    return <ECell section="expense" id={promo ? 'fuchase_promo' : item.id} field="dueDay"
+                    return <ECell section="expense" id={promo ? promo.id : item.id} field="dueDay"
                       value={effDueDay} display={effDueDay || ''} className="due"
-                      title="Due day of month for the fuchase payoff — click to edit" />;
+                      title="Due day of month for the promo payoff — click to edit" />;
                   })()
                 ) : item.type === 'one_time' ? (
                   <td className="due" title={item.onDate ? `One-time — ${item.onDate}` : ''}>{fmtShortDate(item.onDate)}</td>
@@ -1962,7 +1983,18 @@ function DashboardScreen({ data }) {
 
   const checking = accounts.find(a => a.type === 'checking');
   const creditCards = accounts.filter(a => a.type === 'credit');
-  const totalCC = creditCards.reduce((s, a) => s + (a.statementBalance + a.activityBalance + a.pendingBalance), 0);
+  // Card balances come from the ledger (same buckets as the Ledger tab), not stored fields
+  const CC_BUCKETS = ['cc statement', 'cc activity', 'cc pending'];
+  const ccBal = Object.fromEntries(creditCards.map(c => [c.id, data.transactions
+    .filter(t => t.account === c.shortName && CC_BUCKETS.includes(t.cleared))
+    .reduce((s, t) => s + (t.debit || 0) - (t.credit || 0), 0)]));
+  const totalCC = creditCards.reduce((s, c) => s + (ccBal[c.id] || 0), 0);
+  const clearedBal = checking ? (checking.currentBalance || 0) - data.transactions
+    .filter(t => !t.cleared && t.account === checking.shortName)
+    .reduce((s, t) => s + (t.debit || 0) - (t.credit || 0), 0) : 0;
+  // Soonest 0% promo expiry across cards (generic — any card with a promo date)
+  const promoCard = creditCards.filter(c => c.promoExpiry).sort((a, b) => a.promoExpiry.localeCompare(b.promoExpiry))[0] || null;
+  const promoDays = promoCard ? Math.ceil((new Date(promoCard.promoExpiry + 'T00:00:00') - today) / 86400000) : null;
 
   // Current period income/expenses
   const income = cf.income.reduce((s, item) => {
@@ -1976,11 +2008,11 @@ function DashboardScreen({ data }) {
   const varExpenses = cf.expenses.filter(e => e.type === 'variable').reduce((s, e) => s + e.amount, 0);
   const net = income - expenses - varExpenses;
 
-  // Fuchase deadline
-  const fuchase = cf.expenses.find(e => e.id === 'fuchase_monthly');
-  const deadline = fuchase?.deadline ? new Date(fuchase.deadline) : null;
+  // 0% payoff deadline
+  const payoff = findRole(cf, data.accounts, 'promo_payoff');
+  const deadline = payoff?.deadline ? new Date(payoff.deadline) : null;
   const daysToDeadline = deadline ? Math.ceil((deadline - today) / (1000*60*60*24)) : null;
-  const paymentsLeft = fuchase ? Math.ceil(fuchase.remainingBalance / fuchase.paymentAmount) : 0;
+  const paymentsLeft = payoff ? Math.ceil(payoff.remainingBalance / payoff.paymentAmount) : 0;
 
   // Upcoming bills this period
   const upcomingBills = cf.expenses.filter(e =>
@@ -1993,33 +2025,47 @@ function DashboardScreen({ data }) {
         <div className="card">
           <div className="card-title">Checking Balance</div>
           <div className="card-value">{FMT_USD(checking?.currentBalance)}</div>
-          <div className="card-sub">Cleared: {FMT_USD(checking?.clearedBalance)}</div>
+          <div className="card-sub">Cleared: {FMT_USD(clearedBal)}</div>
         </div>
         <div className="card">
           <div className="card-title">This Period Net</div>
-          <div className={`card-value ${net >= 0 ? 'positive' : 'negative'}`}>{net >= 0 ? '+' : ''}{FMT_USD(net)}</div>
+          <div className={`card-value ${net >= 0 ? 'positive' : 'negative'}`}>{net >= 0 ? '+' : '−'}{FMT_USD(net)}</div>
           <div className="card-sub">Income {FMT_USD(income)} · Expenses ~{FMT_USD(expenses + varExpenses)}</div>
         </div>
         <div className="card">
           <div className="card-title">Total CC Balance</div>
           <div className={`card-value ${totalCC > 0 ? 'warning' : 'positive'}`}>{FMT_USD(totalCC)}</div>
-          <div className="card-sub">{creditCards.filter(c => c.statementBalance + c.activityBalance + c.pendingBalance > 0).length} card(s) with balance</div>
+          <div className="card-sub">{creditCards.filter(c => (ccBal[c.id] || 0) > 0.005).length} card(s) with balance</div>
         </div>
+        {payoff ? (
         <div className="card">
-          <div className="card-title">FuChase Payoff Progress</div>
-          <div className="card-value warning">{FMT_USD(fuchase?.remainingBalance)}</div>
+          <div className="card-title">0% Payoff Progress</div>
+          <div className="card-value warning">{FMT_USD(payoff?.remainingBalance)}</div>
           <div className="progress-bar">
-            <div className="progress-fill warning" style={{width: `${Math.max(0, 100 - (fuchase?.remainingBalance / 7217.28 * 100))}%`}} />
+            <div className="progress-fill warning" style={{width: `${Math.max(0, 100 - (payoff?.remainingBalance / (payoff?.originalBalance || 7217.28) * 100))}%`}} />
           </div>
-          <div className="card-sub">{paymentsLeft} payments left · deadline {fuchase?.deadline}</div>
+          <div className="card-sub">{paymentsLeft} payments left · deadline {payoff?.deadline}</div>
         </div>
+        ) : promoCard ? (
+        <div className="card">
+          <div className="card-title">0% Promo · {promoCard.shortName}</div>
+          <div className="card-value warning">{FMT_USD(ccBal[promoCard.id] || 0)}</div>
+          <div className="card-sub">Expires {displayDate(promoCard.promoExpiry)}{promoDays != null ? ` · ${promoDays} days left` : ''}</div>
+        </div>
+        ) : (
+        <div className="card">
+          <div className="card-title">Net Worth</div>
+          <div className="card-value">{FMT_USD_SIGNED(computeNetWorthParts(data).netWorth)}</div>
+          <div className="card-sub">Checking + assets − cards − liabilities</div>
+        </div>
+        )}
       </div>
 
       {/* Alerts */}
       {daysToDeadline !== null && daysToDeadline < 120 && (
         <div className={`alert-box ${daysToDeadline < 60 ? 'urgent' : ''}`}>
-          <div className="alert-title">⚠ 0% APR Deadline — FuChase</div>
-          <div className="alert-sub">{daysToDeadline} days until {fuchase.deadline}. {paymentsLeft} payments of {FMT_USD(fuchase.paymentAmount)} remaining. Balance: {FMT_USD(fuchase.remainingBalance)}.</div>
+          <div className="alert-title">⚠ 0% APR Deadline — {payoff.name}</div>
+          <div className="alert-sub">{daysToDeadline} days until {payoff.deadline}. {paymentsLeft} payments of {FMT_USD(payoff.paymentAmount)} remaining. Balance: {FMT_USD(payoff.remainingBalance)}.</div>
         </div>
       )}
 
@@ -2239,7 +2285,7 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
   const [form, setForm] = useState(() => {
     // Default Cleared to whatever the last-added transaction used (survives reloads)
     const last = data.transactions.find(t => t.id === localStorage.getItem('pfm_last_added_txn'));
-    return { date: new Date().toISOString().slice(0,10), payee:'', cleared: last?.cleared || '', debit:'', credit:'', account:'cu', category:'', notes:'', sub:false };
+    return { date: new Date().toISOString().slice(0,10), payee:'', cleared: last?.cleared || '', debit:'', credit:'', account: data.accounts.find(a => a.type === 'checking')?.shortName || '', category:'', notes:'', sub:false };
   });
   const [editField, setEditField] = useState(null);
   const [editVal, setEditVal] = useState('');

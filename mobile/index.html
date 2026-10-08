@@ -463,7 +463,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm8'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm9'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -1098,7 +1098,7 @@ function CashflowScreen({ data, setData }) {
   // ── Coordinate overlay ──────────────────────────────────────────────────────
   const [showCoords, setShowCoords] = useState(() => localStorage.getItem('pfm_coords') === 'true');
 
-  // ── Freeze rows 1-10 AND columns A-D via sticky ─────────────────────────────
+  // ── Freeze panes at C3: rows 1–2 (header rows) AND columns A–B via sticky ────
   // useLayoutEffect with no dep array: re-stamps after every render so freshly-
   // mounted sub-component <td>s (BalCell/Cell/ECell) never lose the style.
   const cfTableRef = useRef(null);
@@ -1128,7 +1128,7 @@ function CashflowScreen({ data, setData }) {
     const hRow = table.querySelector('.row-period-header') || allRows[0];
     const hCells = [...hRow.querySelectorAll('td')];
     const hasCoord = hCells[0]?.classList.contains('coord-cell');
-    const nFrozenCols = hasCoord ? 5 : 4; // coord? + sec-label + label + amt + due
+    const nFrozenCols = hasCoord ? 3 : 2; // coord? + A (sec-label) + B (label)
     const colLefts = [];
     let cumL = 0;
     for (const hc of hCells) { colLefts.push(cumL); cumL += hc.offsetWidth; }
@@ -1141,7 +1141,8 @@ function CashflowScreen({ data, setData }) {
     let rowsDone = false;
 
     for (const tr of allRows) {
-      const isFrozenRow = !rowsDone;
+      // Rows 1–2 (balance + period header) plus the coord letter row all live in <thead>
+      const isFrozenRow = tr.parentElement && tr.parentElement.tagName === 'THEAD';
       const cells = [...tr.querySelectorAll('td')];
       let vCol = 0; // actual visual column index
 
@@ -1176,7 +1177,6 @@ function CashflowScreen({ data, setData }) {
       }
 
       cumHeight += tr.offsetHeight;
-      if (isFrozenRow && tr.classList.contains('row-subtotal')) rowsDone = true;
     }
   });
 

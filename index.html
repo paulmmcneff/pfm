@@ -456,6 +456,10 @@
     .txe-overlay-top .txe-sugg button { padding: 7px 12px; }
     .txe-overlay-top .txe > * { flex-shrink: 0; }
     .txe-overlay-top .txe-more { align-self: flex-start; }
+    /* Cashflow income/expense settings: drop down from the top, scroll inside when tall */
+    .modal-overlay.sheet-top { align-items: flex-start; }
+    .sheet-top .modal { border-radius: 0 0 16px 16px; max-height: 100dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      padding: calc(14px + env(safe-area-inset-top)) 18px 16px; }
     .txe-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabbar-h, 56px) + 84px); background: rgba(26,58,92,0.95); color: #fff; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 3000; white-space: nowrap; animation: txeIn .2s ease-out; }
     @keyframes txeIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
     /* LEDGER (mobile accounts view) */
@@ -508,7 +512,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm24'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm25'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -1842,8 +1846,8 @@ function CashflowScreen({ data, setData }) {
         <br/>Auto-clearing: a fixed bill clears (<span className="paid-dash">—</span>) when a ledger <em>debit</em> this period matches its name by payee <em>or</em> category · variable budgets match by payee only · income clears to $0 when a ledger <em>credit</em> matches its name <strong>and</strong> has category "salary"
       </div>
 
-      {incomeEditItem && (
-        <div className="modal-overlay" onClick={() => { setIncomeEditItem(null); setAddingIncome(false); }}>
+      {incomeEditItem && ReactDOM.createPortal(
+        <div className="modal-overlay sheet-top" onClick={() => { setIncomeEditItem(null); setAddingIncome(false); }}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-title">{addingIncome ? 'Add Income' : 'Income Settings'}</div>
 
@@ -1934,11 +1938,11 @@ function CashflowScreen({ data, setData }) {
               <button className="modal-btn modal-btn-primary" onClick={saveIncomeModal}>Save</button>
             </div>
           </div>
-        </div>
+        </div>, document.body
       )}
 
-      {expenseEditItem && (
-        <div className="modal-overlay" onClick={() => { setExpenseEditItem(null); setAddingExpense(false); }}>
+      {expenseEditItem && ReactDOM.createPortal(
+        <div className="modal-overlay sheet-top" onClick={() => { setExpenseEditItem(null); setAddingExpense(false); }}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-title">{addingExpense ? 'Add Expense' : 'Expense Settings'}</div>
 
@@ -1988,7 +1992,7 @@ function CashflowScreen({ data, setData }) {
               <button className="modal-btn modal-btn-primary" onClick={saveExpenseModal}>Save</button>
             </div>
           </div>
-        </div>
+        </div>, document.body
       )}
     </div>
   );

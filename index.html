@@ -479,6 +479,7 @@
     .lg-amt.big { font-size: 20px; }
     .lg-amt-col { text-align: right; flex-shrink: 0; }
     .lg-sub { font-size: 11px; color: #888; margin-top: 2px; }
+    .lg-screen .neg, .txe .neg, .txs-updated .neg, .card-value.neg { color: #cc2200; }
     .lg-screen .neg { color: #cc2200; } .lg-screen .pos, .lg-amt.pos { color: #1a7a1a; }
     .lg-chev { color: #c4cad3; font-size: 20px; line-height: 1; margin-left: -2px; }
     .lg-kv { display: flex; justify-content: space-between; padding: 10px 14px; border-top: 1px solid #eee; font-size: 13px; color: #666; }
@@ -507,7 +508,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm22'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm23'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -2068,8 +2069,8 @@ function DashboardScreen({ data }) {
       <div className="dash-grid">
         <div className="card">
           <div className="card-title">Checking Balance</div>
-          <div className="card-value">{FMT_USD(checking?.currentBalance)}</div>
-          <div className="card-sub">Cleared: {FMT_USD(clearedBal)}</div>
+          <div className={`card-value ${(checking?.currentBalance||0) < 0 ? 'neg' : ''}`}>{FMT_USD_SIGNED(checking?.currentBalance)}</div>
+          <div className="card-sub">Cleared: {FMT_USD_SIGNED(clearedBal)}</div>
         </div>
         <div className="card">
           <div className="card-title">This Period Net</div>
@@ -2829,8 +2830,8 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
         <div className="lg-hero-label">Net worth</div>
         <div className={`lg-hero-amt ${netWorth < 0 ? 'neg' : ''}`}>{FMT_USD_SIGNED(netWorth)}</div>
         <div className="lg-hero-row">
-          <span>Checking <b>{FMT_USD(checking?.currentBalance || 0)}</b></span>
-          {cashAccounts.length > 0 && <span>Cash <b>{FMT_USD(cashTotalAll)}</b></span>}
+          <span>Checking <b>{FMT_USD_SIGNED(checking?.currentBalance || 0)}</b></span>
+          {cashAccounts.length > 0 && <span>Cash <b>{FMT_USD_SIGNED(cashTotalAll)}</b></span>}
           <span>Cards <b>−{FMT_USD(ccTotalAll)}</b></span>
           {otherAccounts.length > 0 && <span>Other <b>{FMT_USD_SIGNED(otherNet)}</b></span>}
         </div>
@@ -2845,9 +2846,9 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
               <div className="lg-name">{checking.name || 'Checking'}</div>
               <div className="lg-meta">Updated {WITH_YEAR(checking.lastUpdated) || '—'} · tap to update balance</div>
             </div>
-            <div className="lg-amt big">{FMT_USD(checking.currentBalance || 0)}</div><Chev />
+            <div className={`lg-amt big ${(checking.currentBalance||0) < 0 ? 'neg' : ''}`}>{FMT_USD_SIGNED(checking.currentBalance || 0)}</div><Chev />
           </div>
-          <div className="lg-kv"><span>Cleared balance</span><b>{FMT_USD(computedClearedBalance)}</b></div>
+          <div className="lg-kv"><span>Cleared balance</span><b className={computedClearedBalance < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(computedClearedBalance)}</b></div>
           <div className="lg-kv"><span>Min projected{cashflowMinPeriod ? ` (${cashflowMinPeriod.label})` : ''}</span><b className={cashflowMinBal < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(cashflowMinBal)}</b></div>
           <button className="lg-link" onClick={() => go({ account: checking.shortName })}>View checking transactions <Chev /></button>
         </div>
@@ -2917,9 +2918,9 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
             <div key={a.id} className="lg-row" onClick={() => setLsheet({ kind:'cash', id: a.id, vals:{ name: a.shortName, amount: String(a.currentBalance || 0) } })}>
               <div className="lg-main">
                 <div className="lg-name">{a.shortName}</div>
-                <div className="lg-meta">Cleared {FMT_USD(cleared)} · updated {a.lastUpdated || '—'}</div>
+                <div className="lg-meta">Cleared {FMT_USD_SIGNED(cleared)} · updated {a.lastUpdated || '—'}</div>
               </div>
-              <div className="lg-amt">{FMT_USD(a.currentBalance || 0)}</div><Chev />
+              <div className={`lg-amt ${(a.currentBalance||0) < 0 ? 'neg' : ''}`}>{FMT_USD_SIGNED(a.currentBalance || 0)}</div><Chev />
             </div>
           );
         })}
@@ -3034,7 +3035,7 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
 
             {lsheet.kind === 'checking' && (
               <div className="lg-breakdown">
-                <div><span>Cleared balance</span><b>{FMT_USD(computedClearedBalance)}</b></div>
+                <div><span>Cleared balance</span><b className={computedClearedBalance < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(computedClearedBalance)}</b></div>
                 <div><span>Last updated</span><b>{WITH_YEAR(checking?.lastUpdated) || '—'}</b></div>
               </div>
             )}
@@ -3320,7 +3321,7 @@ function TransactionsScreen({ data, setData }) {
           <span>{filtered.length.toLocaleString()} transactions</span>
           <span><span className="txs-out">−{FMT_USD(totals.out)}</span> · <span className="txs-in">+{FMT_USD(totals.inn)}</span></span>
         </div>
-        {updatedInfo && <div className="txs-updated"><b>{updatedInfo.name}</b> {updatedInfo.label} {updatedInfo.date} · balance <b>{FMT_USD(updatedInfo.balance)}</b></div>}
+        {updatedInfo && <div className="txs-updated"><b>{updatedInfo.name}</b> {updatedInfo.label} {updatedInfo.date} · balance <b className={updatedInfo.balance < 0 ? 'neg' : ''}>{FMT_USD_SIGNED(updatedInfo.balance)}</b></div>}
         {lastEntered && <div className="txs-updated txs-last-entered" onClick={() => openEdit(lastEntered)}>
           Last entered: <b>{lastEntered.payee || '(no payee)'}</b> {lastEntered.credit ? '+' : '−'}{FMT_USD(lastEntered.credit || lastEntered.debit || 0)} · {displayDate(lastEntered.date)}
         </div>}

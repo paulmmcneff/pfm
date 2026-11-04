@@ -430,6 +430,25 @@
     .txe-save { display: block; width: 100%; margin-top: 22px; border: none; border-radius: 14px; background: #1a3a5c; color: #fff; font-size: 16px; font-weight: 700; padding: 15px; cursor: pointer; }
     .txe-save:disabled { background: #c9d2dd; cursor: default; }
     .txe-delete { display: block; width: 100%; margin-top: 10px; border: none; background: none; color: #cc2200; font-size: 14px; font-weight: 600; padding: 8px; cursor: pointer; }
+    /* Compact entry sheet: everything fits on one phone screen without scrolling */
+    .txs-sheet { overscroll-behavior: contain; }
+    .txe { padding: 6px 16px calc(12px + env(safe-area-inset-bottom)) !important; }
+    .txe .txe-grab { margin-bottom: 4px; }
+    .txe .txe-head { margin-bottom: 6px; }
+    .txe .txs-kind { margin-bottom: 4px; }
+    .txe .txs-kind button { padding: 6px; }
+    .txe .txe-amount { padding: 0 0 2px; }
+    .txe .txe-sign { font-size: 22px; }
+    .txe .txe-amount input { font-size: 36px; }
+    .txe .txe-payee { font-size: 17px !important; padding: 5px 2px; }
+    .txe .txe-label { margin: 10px 0 0; font-size: 10px; }
+    .txe .txe-input { padding: 7px 12px; margin-top: 4px; }
+    .txe .txe-chips { margin-top: 5px; }
+    .txe .txe-chips-row { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .txe .txe-chips-row::-webkit-scrollbar { display: none; }
+    .txe .txe-more { margin-top: 10px; }
+    .txe .txe-save { margin-top: 12px; padding: 13px; }
+    .txe .txe-delete { margin-top: 2px; padding: 6px; }
     .txe-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabbar-h, 56px) + 84px); background: rgba(26,58,92,0.95); color: #fff; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 3000; white-space: nowrap; animation: txeIn .2s ease-out; }
     @keyframes txeIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
     /* LEDGER (mobile accounts view) */
@@ -481,7 +500,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm18'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm19'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -3334,7 +3353,9 @@ function TransactionsScreen({ data, setData }) {
         const suggestions = payeeFocus ? payeeIndex.filter(p => p.key !== q && (!q || p.key.includes(q))).slice(0, 5) : [];
         const amtNum = parseFloat(f.amount) || 0;
         const canSave = f.payee.trim() && (amtNum > 0 || sheet.mode === 'edit');
-        return (
+        // Rendered into <body> so it sits above the bottom tab bar (inside the scrolling screen,
+        // iOS layered the tab bar on top of the sheet and hid the Save button).
+        return ReactDOM.createPortal(
         <div className="modal-overlay" onClick={() => setSheet(null)}>
           <div className="modal txs-sheet txe" onClick={e => e.stopPropagation()}>
             <div className="txe-grab" />
@@ -3375,7 +3396,7 @@ function TransactionsScreen({ data, setData }) {
             <input className="txe-input" list="txs-cats" placeholder="Category" value={f.category} onChange={e => setF({category:e.target.value})} />
             <datalist id="txs-cats">{categories.map(c => <option key={c} value={c} />)}</datalist>
             {recentCats.length > 0 && (
-              <div className="txs-chips txe-chips">
+              <div className="txs-chips txe-chips txe-chips-row">
                 {recentCats.map(c => <button key={c} className={`txs-chip ${f.category===c?'on':''}`} onClick={() => setF({category: f.category===c ? '' : c})}>{c}</button>)}
               </div>
             )}
@@ -3403,7 +3424,7 @@ function TransactionsScreen({ data, setData }) {
 
             <div className="txe-label">Status</div>
             <div className="txs-chips txe-chips">
-              {clearedOpts.map(o => <button key={o||'blank'} className={`txs-chip ${STATUS_CHIP_CLASS[o]||''} ${f.cleared===o?'on':''}`} onClick={() => setF({cleared:o})}>{o ? CLEARED_LABEL[o] || o : 'Uncleared'}</button>)}
+              {clearedOpts.map(o => <button key={o||'blank'} className={`txs-chip ${STATUS_CHIP_CLASS[o]||''} ${f.cleared===o?'on':''}`} onClick={() => setF({cleared:o})}>{o ? (CLEARED_LABEL[o] || o).replace(/^CC /, '') : 'Uncleared'}</button>)}
             </div>
 
             {!showMore && !f.notes && !f.sub
@@ -3421,7 +3442,7 @@ function TransactionsScreen({ data, setData }) {
             </button>
             {sheet.mode === 'edit' && <button className="txe-delete" onClick={deleteSheet}>Delete transaction</button>}
           </div>
-        </div>
+        </div>, document.body
         );
       })()}
       {toast && <div className="txe-toast">{toast}</div>}

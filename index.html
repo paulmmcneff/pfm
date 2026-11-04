@@ -344,6 +344,8 @@
     .cf-table td.amt { width: 54px; }
     .cf-table td.due { width: 30px; padding-left: 2px; padding-right: 2px; }
     .sec-label, .sec-label-empty { width: 12px; min-width: 12px; max-width: 12px; }
+    /* Override the generic .cf-table td 8px side padding so the vertical INCOME/EXPENSE text centers in its narrow column */
+    .cf-table td.sec-label, .cf-table td.sec-label-empty { padding-left: 0; padding-right: 0; }
 
     /* Ledger top-section cards (checking/category summary, date-range
        pickers, payee filter) use small inline-styled inputs — bump them too
@@ -463,7 +465,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm11'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm12'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────

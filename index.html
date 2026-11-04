@@ -360,6 +360,15 @@
     .txs-chips::-webkit-scrollbar { display: none; }
     .txs-chip { flex-shrink: 0; border: 1px solid #c8d3e0; background: #fff; color: #1a3a5c; border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
     .txs-chip.on { background: #1a3a5c; border-color: #1a3a5c; color: #fff; }
+    /* Edit-sheet status chips use the same colors as the status text and cleared circles */
+    .txs-chip.st-yes { color: #1a7a1a; border-color: #a9d3a9; }
+    .txs-chip.st-cc { color: #1a5ca8; border-color: #a9c4e6; }
+    .txs-chip.st-pending { color: #b85c00; border-color: #e6c39f; }
+    .txs-chip.st-statement { color: #555; border-color: #bbb; }
+    .txs-chip.st-yes.on { background: #1a7a1a; border-color: #1a7a1a; color: #fff; }
+    .txs-chip.st-cc.on { background: #1a5ca8; border-color: #1a5ca8; color: #fff; }
+    .txs-chip.st-pending.on { background: #b85c00; border-color: #b85c00; color: #fff; }
+    .txs-chip.st-statement.on { background: #555; border-color: #555; color: #fff; }
     .txs-summary { display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-top: 8px; }
     .txs-out { color: #222; } .txs-in { color: #1a7a1a; }
     .txs-group { padding: 0 12px; }
@@ -469,7 +478,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm13'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm14'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -2101,6 +2110,7 @@ const CLEARED_OPTIONS = ['', 'yes', 'cc activity', 'cc pending', 'cc statement']
 const CLEARED_LABEL = { yes:'Cleared', 'cc activity':'CC Activity', 'cc pending':'CC Pending', 'cc statement':'CC Statement', '':'—' };
 const CLEARED_CLASS = { yes:'cleared-yes', 'cc activity':'cleared-cc', 'cc pending':'cleared-pending', 'cc statement':'cleared-statement', '':'cleared-blank' };
 const DOT_CLASS = { 'cc activity':'dot-cc', 'cc pending':'dot-pending', 'cc statement':'dot-statement' }; // 'yes' keeps the default green
+const STATUS_CHIP_CLASS = { yes:'st-yes', 'cc activity':'st-cc', 'cc pending':'st-pending', 'cc statement':'st-statement' }; // Edit sheet status chips; '' (Uncleared) keeps the default navy
 
 // ─── SHARED TRANSACTION TABLE ───────────────────────────────────────────────
 function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, sortDir, onSort, accounts = [], totals, filters, onFilterChange, highlightId }) {
@@ -3352,7 +3362,7 @@ function TransactionsScreen({ data, setData }) {
 
             <div className="txe-label">Status</div>
             <div className="txs-chips txe-chips">
-              {clearedOpts.map(o => <button key={o||'blank'} className={`txs-chip ${f.cleared===o?'on':''}`} onClick={() => setF({cleared:o})}>{o ? CLEARED_LABEL[o] || o : 'Uncleared'}</button>)}
+              {clearedOpts.map(o => <button key={o||'blank'} className={`txs-chip ${STATUS_CHIP_CLASS[o]||''} ${f.cleared===o?'on':''}`} onClick={() => setF({cleared:o})}>{o ? CLEARED_LABEL[o] || o : 'Uncleared'}</button>)}
             </div>
 
             {!showMore && !f.notes && !f.sub

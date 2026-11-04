@@ -372,6 +372,7 @@
     .txs-summary { display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-top: 8px; }
     .txs-updated { font-size: 11px; color: #777; margin-top: 4px; }
     .txs-updated b { color: #1a3a5c; font-weight: 600; }
+    .txs-last-entered { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .txs-out { color: #222; } .txs-in { color: #1a7a1a; }
     .txs-group { padding: 0 12px; }
     .txs-day { font-size: 11px; font-weight: 700; color: #777; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 4px 6px; }
@@ -480,7 +481,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm16'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm17'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -3109,6 +3110,24 @@ function TransactionsScreen({ data, setData }) {
     const [y, m, d] = latest.split('-');
     return { name, label: 'latest transaction', date: `${+m}/${+d}/${y.slice(2)}` };
   }, [acctFilter, data.accounts, data.transactions]);
+  // Most recently *entered* transaction for the same account as the updated line.
+  // Manually added txns use Date.now() as their id; CSV imports use csv_<row>_<timestamp>.
+  const lastEntered = useMemo(() => {
+    if (!updatedInfo) return null;
+    const entryKey = id => {
+      const s = String(id || '');
+      if (/^\d+$/.test(s)) return [Number(s), 0];
+      const m = s.match(/^csv_(\d+)_(\d+)$/);
+      return m ? [Number(m[2]), Number(m[1])] : [0, 0];
+    };
+    let best = null, bk = [0, 0];
+    data.transactions.forEach(t => {
+      if (t.account !== updatedInfo.name) return;
+      const k = entryKey(t.id);
+      if (!best || k[0] > bk[0] || (k[0] === bk[0] && k[1] > bk[1])) { best = t; bk = k; }
+    });
+    return best;
+  }, [updatedInfo, data.transactions]);
   const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('pfm_txn_status') || '');
   const [limit, setLimit] = useState(100);
   const [sheet, setSheet] = useState(null); // null | { mode:'add'|'edit', id?, form }
@@ -3268,6 +3287,9 @@ function TransactionsScreen({ data, setData }) {
           <span><span className="txs-out">−{FMT_USD(totals.out)}</span> · <span className="txs-in">+{FMT_USD(totals.inn)}</span></span>
         </div>
         {updatedInfo && <div className="txs-updated"><b>{updatedInfo.name}</b> {updatedInfo.label} {updatedInfo.date}</div>}
+        {lastEntered && <div className="txs-updated txs-last-entered" onClick={() => openEdit(lastEntered)}>
+          Last entered: <b>{lastEntered.payee || '(no payee)'}</b> {lastEntered.credit ? '+' : '−'}{FMT_USD(lastEntered.credit || lastEntered.debit || 0)} · {displayDate(lastEntered.date)}
+        </div>}
       </div>
 
       {groups.length === 0 && <div className="txs-empty">No transactions match.</div>}

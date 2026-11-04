@@ -449,6 +449,13 @@
     .txe .txe-more { margin-top: 10px; }
     .txe .txe-save { margin-top: 12px; padding: 13px; }
     .txe .txe-delete { margin-top: 2px; padding: 6px; }
+    /* Transaction sheet drops down from the top so the iPhone keyboard has room below it */
+    .modal-overlay.txe-overlay-top { align-items: flex-start; }
+    .txe-overlay-top .txe { border-radius: 0 0 16px 16px; padding-top: calc(8px + env(safe-area-inset-top)) !important; padding-bottom: 12px !important; display: flex; flex-direction: column; }
+    .txe-overlay-top .txe-grab { order: 99; margin: 10px auto 0; }
+    .txe-overlay-top .txe-sugg button { padding: 7px 12px; }
+    .txe-overlay-top .txe > * { flex-shrink: 0; }
+    .txe-overlay-top .txe-more { align-self: flex-start; }
     .txe-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--tabbar-h, 56px) + 84px); background: rgba(26,58,92,0.95); color: #fff; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 3000; white-space: nowrap; animation: txeIn .2s ease-out; }
     @keyframes txeIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
     /* LEDGER (mobile accounts view) */
@@ -500,7 +507,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm19'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm20'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -3350,13 +3357,13 @@ function TransactionsScreen({ data, setData }) {
         const todayIso = new Date().toLocaleDateString('en-CA');
         const yd = new Date(); yd.setDate(yd.getDate() - 1); const yIso = yd.toLocaleDateString('en-CA');
         const q = f.payee.trim().toLowerCase();
-        const suggestions = payeeFocus ? payeeIndex.filter(p => p.key !== q && (!q || p.key.includes(q))).slice(0, 5) : [];
+        const suggestions = payeeFocus ? payeeIndex.filter(p => p.key !== q && (!q || p.key.includes(q))).slice(0, 4) : [];
         const amtNum = parseFloat(f.amount) || 0;
         const canSave = f.payee.trim() && (amtNum > 0 || sheet.mode === 'edit');
         // Rendered into <body> so it sits above the bottom tab bar (inside the scrolling screen,
         // iOS layered the tab bar on top of the sheet and hid the Save button).
         return ReactDOM.createPortal(
-        <div className="modal-overlay" onClick={() => setSheet(null)}>
+        <div className="modal-overlay txe-overlay-top" onClick={() => setSheet(null)}>
           <div className="modal txs-sheet txe" onClick={e => e.stopPropagation()}>
             <div className="txe-grab" />
             <div className="txe-head">

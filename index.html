@@ -370,6 +370,10 @@
     .txs-row:active { background: #f2f6fb; }
     .txs-dot { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #c8d3e0; background: #fff; color: #fff; font-size: 13px; font-weight: 700; line-height: 1; padding: 0; cursor: pointer; }
     .txs-dot.on { background: #1a7a1a; border-color: #1a7a1a; }
+    /* Circle color follows the cleared status, matching the .cleared-* text colors */
+    .txs-dot.on.dot-cc { background: #1a5ca8; border-color: #1a5ca8; }
+    .txs-dot.on.dot-pending { background: #b85c00; border-color: #b85c00; }
+    .txs-dot.on.dot-statement { background: #555; border-color: #555; }
     .txs-main { flex: 1; min-width: 0; }
     .txs-payee { font-size: 14px; font-weight: 600; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .txs-meta { font-size: 11px; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -465,7 +469,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm12'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm13'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -2096,6 +2100,7 @@ function DashboardScreen({ data }) {
 const CLEARED_OPTIONS = ['', 'yes', 'cc activity', 'cc pending', 'cc statement'];
 const CLEARED_LABEL = { yes:'Cleared', 'cc activity':'CC Activity', 'cc pending':'CC Pending', 'cc statement':'CC Statement', '':'—' };
 const CLEARED_CLASS = { yes:'cleared-yes', 'cc activity':'cleared-cc', 'cc pending':'cleared-pending', 'cc statement':'cleared-statement', '':'cleared-blank' };
+const DOT_CLASS = { 'cc activity':'dot-cc', 'cc pending':'dot-pending', 'cc statement':'dot-statement' }; // 'yes' keeps the default green
 
 // ─── SHARED TRANSACTION TABLE ───────────────────────────────────────────────
 function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, sortDir, onSort, accounts = [], totals, filters, onFilterChange, highlightId }) {
@@ -3246,7 +3251,7 @@ function TransactionsScreen({ data, setData }) {
               const amt = isCredit ? t.credit : (t.debit || 0);
               return (
                 <div key={t.id} className="txs-row" onClick={() => openEdit(t)}>
-                  <button className={`txs-dot ${t.cleared ? 'on' : ''}`} title={t.cleared ? 'Mark uncleared' : 'Mark cleared'} onClick={e => quickClear(e, t)}>{t.cleared ? '✓' : ''}</button>
+                  <button className={`txs-dot ${t.cleared ? 'on ' + (DOT_CLASS[t.cleared] || '') : ''}`} title={t.cleared ? 'Mark uncleared' : 'Mark cleared'} onClick={e => quickClear(e, t)}>{t.cleared ? '✓' : ''}</button>
                   <div className="txs-main">
                     <div className="txs-payee">{t.payee || '(no payee)'}</div>
                     <div className="txs-meta">

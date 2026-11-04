@@ -508,7 +508,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm23'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm24'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -1100,6 +1100,12 @@ function computeCashflowForecast(data, periods, today) {
         const rec = isCur ? carryRecon.byExpense[i.id] : undefined;
         // Reconciled bills use oldest-first payment assignment; everything else
         // keeps the simple same-period ledger match.
+        // Manual per-period override (typed into the grid) replaces the whole cell for that
+        // period — formula amount, paid detection and carryover — mirroring income overrides.
+        const pk = periodKey(p);
+        if (i.periodOverrides && Object.prototype.hasOwnProperty.call(i.periodOverrides, pk)) {
+          return { ...i, value: i.periodOverrides[pk] || 0, paid: false, carried: 0, absorbed: [], overridden: true };
+        }
         const paid = rec ? (rec.hasCurrentInstance && rec.currentInstancePaid) : expensePaidThisPeriod(i, p);
         return { ...i, value: paid ? 0 : getExpenseValue(i, p), paid, carried: rec ? rec.carried : 0,
           absorbed: rec ? rec.absorbed : [] };
@@ -1488,6 +1494,15 @@ function CashflowScreen({ data, setData }) {
         else overrides[field] = parseFloat(editVal) || 0;
         return { ...i, periodOverrides: overrides };
       });
+    } else if (section === 'expenseOverride') {
+      // Same rule as income: blank clears the override and reverts to the normal amount
+      cf.expenses = cf.expenses.map(x => {
+        if (x.id !== id) return x;
+        const overrides = { ...(x.periodOverrides || {}) };
+        if (editVal.trim() === '') delete overrides[field];
+        else overrides[field] = parseFloat(editVal) || 0;
+        return { ...x, periodOverrides: overrides };
+      });
     } else if (section === 'deduction') {
       cf.deductions = cf.deductions.map(d => d.id === id ? { ...d, [field]: parseFloat(editVal) || 0 } : d);
     } else if (section === 'expense') {
@@ -1760,24 +1775,32 @@ function CashflowScreen({ data, setData }) {
                   const it = expItems.find(i => i.id === item.id);
                   const v = it?.value || 0;
                   const carried = it?.carried || 0;
+                  const pKey = periodKey(period);
+                  const cur = isCurrentPeriod(period) ? 'col-current' : '';
+                  // Every expense period cell is editable: typing sets an override for that period only
+                  // (0 zeroes it), clearing the field reverts to the normal amount.
+                  const edit = (display, extra, title, startVal) => (
+                    <ECell key={pKey} section="expenseOverride" id={item.id} field={pKey}
+                      value={item.periodOverrides?.[pKey] ?? startVal}
+                      display={display} className={['num', cur, extra].filter(Boolean).join(' ')} title={title} />
+                  );
+                  if (it?.overridden) {
+                    return edit(v === 0 ? <span className="zero">—</span> : FMT_USD(v), 'override-cell',
+                      'Manually set for this period — tap to change, clear the field to revert to the normal amount', v);
+                  }
                   if (carried > 0) {
-                    const cls = ['num', 'carryover-cell', isCurrentPeriod(period) ? 'col-current' : ''].filter(Boolean).join(' ');
-                    return <td key={periodKey(period)} className={cls}
-                      title={`Includes ${FMT_USD(carried)} carried over — due in a previous period but no matching payment found in the ledger`}>
-                      {FMT_USD(v + carried)}</td>;
+                    return edit(FMT_USD(v + carried), 'carryover-cell',
+                      `Includes ${FMT_USD(carried)} carried over — due in a previous period but no matching payment found in the ledger. Tap to set this period's amount.`, v + carried);
                   }
                   if (it?.paid) {
-                    const cls = ['num', isCurrentPeriod(period) ? 'col-current' : '', 'paid-dash'].filter(Boolean).join(' ');
-                    return <td key={periodKey(period)} className={cls} title="Paid — matching transaction found in the ledger">—</td>;
+                    return edit('—', 'paid-dash', 'Paid — matching transaction found in the ledger. Tap to set this period\'s amount.', 0);
                   }
                   if (isCurrentPeriod(period) && v > 0 && it?.absorbed?.length > 0) {
                     // A payment exists but was applied (oldest-first) to an older unpaid instance
-                    const cls = ['num', 'col-current'].filter(Boolean).join(' ');
-                    return <td key={periodKey(period)} className={cls} style={{textDecoration:'underline dotted #b45309'}}
-                      title={`Still showing as due: your recent "${item.name}" payment was applied to the older unpaid bill from the ${it.absorbed.join(', ')} period (payments settle oldest-first). If that older bill was actually paid, make sure its payment is in the ledger with a payee matching "${item.ledgerMatch || item.name}" — or dismiss the carryover to release your payment to this period.`}>
-                      {FMT_USD(v)}</td>;
+                    return edit(<span style={{textDecoration:'underline dotted #b45309'}}>{FMT_USD(v)}</span>, '',
+                      `Still showing as due: your recent "${item.name}" payment was applied to the older unpaid bill from the ${it.absorbed.join(', ')} period (payments settle oldest-first). If that older bill was actually paid, make sure its payment is in the ledger with a payee matching "${item.ledgerMatch || item.name}" — or dismiss the carryover to release your payment to this period.`, v);
                   }
-                  return <Cell key={periodKey(period)} value={v} isCurrent={isCurrentPeriod(period)} />;
+                  return edit(v === 0 ? '' : FMT_USD(v), v === 0 ? 'zero' : '', 'Tap to set this period\'s amount', v);
                 })}
               </tr>
             ))}

@@ -370,6 +370,8 @@
     .txs-chip.st-pending.on { background: #b85c00; border-color: #b85c00; color: #fff; }
     .txs-chip.st-statement.on { background: #555; border-color: #555; color: #fff; }
     .txs-summary { display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-top: 8px; }
+    .txs-updated { font-size: 11px; color: #777; margin-top: 4px; }
+    .txs-updated b { color: #1a3a5c; font-weight: 600; }
     .txs-out { color: #222; } .txs-in { color: #1a7a1a; }
     .txs-group { padding: 0 12px; }
     .txs-day { font-size: 11px; font-weight: 700; color: #777; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 4px 6px; }
@@ -478,7 +480,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm15'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm16'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -3091,6 +3093,22 @@ function TransactionsScreen({ data, setData }) {
   const acctShorts = useMemo(() => data.accounts.filter(a => a.shortName).map(a => a.shortName), [data.accounts]);
   const [search, setSearch] = useState(() => { const s0 = localStorage.getItem('pfm_txn_search_once') || ''; localStorage.removeItem('pfm_txn_search_once'); return s0; });
   const [acctFilter, setAcctFilter] = useState(() => localStorage.getItem('pfm_txn_acct') || '');
+  // "Updated" line above the list: the checking (credit union) account when All accounts is selected,
+  // otherwise the selected account. Accounts without a stored lastUpdated (e.g. credit cards) fall back
+  // to the date of their most recent transaction.
+  const updatedInfo = useMemo(() => {
+    const acct = acctFilter
+      ? data.accounts.find(a => a.shortName === acctFilter)
+      : data.accounts.find(a => a.type === 'checking');
+    if (!acct) return null;
+    const name = acct.shortName || acct.name;
+    if (acct.lastUpdated) return { name, label: 'updated', date: WITH_YEAR(acct.lastUpdated) };
+    let latest = '';
+    data.transactions.forEach(t => { if (t.account === name) { const d = parseDateForSort(t.date); if (d > latest) latest = d; } });
+    if (!latest) return { name, label: 'updated', date: '—' };
+    const [y, m, d] = latest.split('-');
+    return { name, label: 'latest transaction', date: `${+m}/${+d}/${y.slice(2)}` };
+  }, [acctFilter, data.accounts, data.transactions]);
   const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('pfm_txn_status') || '');
   const [limit, setLimit] = useState(100);
   const [sheet, setSheet] = useState(null); // null | { mode:'add'|'edit', id?, form }
@@ -3249,6 +3267,7 @@ function TransactionsScreen({ data, setData }) {
           <span>{filtered.length.toLocaleString()} transactions</span>
           <span><span className="txs-out">−{FMT_USD(totals.out)}</span> · <span className="txs-in">+{FMT_USD(totals.inn)}</span></span>
         </div>
+        {updatedInfo && <div className="txs-updated"><b>{updatedInfo.name}</b> {updatedInfo.label} {updatedInfo.date}</div>}
       </div>
 
       {groups.length === 0 && <div className="txs-empty">No transactions match.</div>}

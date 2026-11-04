@@ -2,7 +2,7 @@
 // it never collides with the desktop app's own service worker one level up.
 // Bump CACHE whenever APP_VERSION (in this folder's index.html) changes so
 // phones pick up new versions.
-const CACHE = 'pfm-mobile-m17';
+const CACHE = 'pfm-mobile-m18';
 const ASSETS = [
   './',
   './index.html',
@@ -30,10 +30,16 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const isPage = e.request.mode === 'navigate' || e.request.url.endsWith('index.html');
   if (isPage) {
-    // Network-first for the app itself so updates arrive; cache fallback when offline
+    // Network-first for the app itself so updates arrive; cache fallback when offline.
+    // cache: 'no-store' skips the browser's HTTP cache — GitHub Pages lets browsers reuse
+    // the page for up to 10 minutes, which delayed new versions after a push.
     e.respondWith(
-      fetch(e.request)
-        .then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; })
+      fetch(new Request(e.request.url, { cache: 'no-store', credentials: 'same-origin' }))
+        .then(r => {
+          // iOS rejects redirected responses for page loads, so pass redirects through as real redirects
+          if (r.redirected) return Response.redirect(r.url, 302);
+          const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r;
+        })
         .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
     );
   } else {

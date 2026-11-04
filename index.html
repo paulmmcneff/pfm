@@ -478,7 +478,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm14'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm15'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -2110,7 +2110,7 @@ const CLEARED_OPTIONS = ['', 'yes', 'cc activity', 'cc pending', 'cc statement']
 const CLEARED_LABEL = { yes:'Cleared', 'cc activity':'CC Activity', 'cc pending':'CC Pending', 'cc statement':'CC Statement', '':'—' };
 const CLEARED_CLASS = { yes:'cleared-yes', 'cc activity':'cleared-cc', 'cc pending':'cleared-pending', 'cc statement':'cleared-statement', '':'cleared-blank' };
 const DOT_CLASS = { 'cc activity':'dot-cc', 'cc pending':'dot-pending', 'cc statement':'dot-statement' }; // 'yes' keeps the default green
-const STATUS_CHIP_CLASS = { yes:'st-yes', 'cc activity':'st-cc', 'cc pending':'st-pending', 'cc statement':'st-statement' }; // Edit sheet status chips; '' (Uncleared) keeps the default navy
+const STATUS_CHIP_CLASS = { yes:'st-yes', 'cc activity':'st-cc', 'cc pending':'st-pending', 'cc statement':'st-statement' }; // Status chips (edit sheet + list filter); Uncleared/All keep the default navy
 
 // ─── SHARED TRANSACTION TABLE ───────────────────────────────────────────────
 function TransactionTable({ transactions, onUpdate, onDelete, maxRows, sortCol, sortDir, onSort, accounts = [], totals, filters, onFilterChange, highlightId }) {
@@ -3243,7 +3243,7 @@ function TransactionsScreen({ data, setData }) {
           {acctShorts.map(s => <button key={s} className={`txs-chip ${acctFilter===s?'on':''}`} onClick={() => pickAcct(s)}>{s}</button>)}
         </div>
         <div className="txs-chips">
-          {STATUS_CHIPS.map(([v, l]) => <button key={v||'all'} className={`txs-chip ${statusFilter===v?'on':''}`} onClick={() => pickStatus(v)}>{l}</button>)}
+          {STATUS_CHIPS.map(([v, l]) => <button key={v||'all'} className={`txs-chip ${STATUS_CHIP_CLASS[v]||''} ${statusFilter===v?'on':''}`} onClick={() => pickStatus(v)}>{l}</button>)}
         </div>
         <div className="txs-summary">
           <span>{filtered.length.toLocaleString()} transactions</span>

@@ -507,7 +507,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm21'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm22'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -2971,8 +2971,10 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
       </div>
       <div style={{height:24}} />
 
-      {lsheet && (
-        <div className="modal-overlay" onClick={() => setLsheet(null)}>
+      {/* Rendered into <body> and pinned to the top, like the transaction sheet, so the
+          tab bar can't cover the Save button and the keyboard has room below */}
+      {lsheet && ReactDOM.createPortal(
+        <div className="modal-overlay txe-overlay-top" onClick={() => setLsheet(null)}>
           <div className="modal txs-sheet txe" onClick={e => e.stopPropagation()}>
             <div className="txe-grab" />
             <div className="txe-head">
@@ -3076,7 +3078,7 @@ function LedgerScreen({ data, setData, onOpenTxns }) {
               <button className="txe-delete" onClick={() => removeFromSheet(lsheet.id)}>Remove account</button>
             )}
           </div>
-        </div>
+        </div>, document.body
       )}
     </div>
   );

@@ -507,7 +507,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm20'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm21'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -3129,12 +3129,18 @@ function TransactionsScreen({ data, setData }) {
       : data.accounts.find(a => a.type === 'checking');
     if (!acct) return null;
     const name = acct.shortName || acct.name;
-    if (acct.lastUpdated) return { name, label: 'updated', date: WITH_YEAR(acct.lastUpdated) };
+    // Current balance: same figures the Ledger shows — stored balance for bank/cash/other accounts,
+    // statement + activity + pending (computed from transactions) for credit cards.
+    const ccSum = st => data.transactions.filter(t => t.account === name && t.cleared === st).reduce((s, t) => s + (t.debit || 0) - (t.credit || 0), 0);
+    const balance = acct.type === 'credit'
+      ? ccSum('cc statement') + ccSum('cc activity') + ccSum('cc pending')
+      : (acct.currentBalance ?? acct.balance ?? 0);
+    if (acct.lastUpdated) return { name, balance, label: 'updated', date: WITH_YEAR(acct.lastUpdated) };
     let latest = '';
     data.transactions.forEach(t => { if (t.account === name) { const d = parseDateForSort(t.date); if (d > latest) latest = d; } });
-    if (!latest) return { name, label: 'updated', date: '—' };
+    if (!latest) return { name, balance, label: 'updated', date: '—' };
     const [y, m, d] = latest.split('-');
-    return { name, label: 'latest transaction', date: `${+m}/${+d}/${y.slice(2)}` };
+    return { name, balance, label: 'latest transaction', date: `${+m}/${+d}/${y.slice(2)}` };
   }, [acctFilter, data.accounts, data.transactions]);
   // Most recently *entered* transaction for the same account as the updated line.
   // Manually added txns use Date.now() as their id; CSV imports use csv_<row>_<timestamp>.
@@ -3312,7 +3318,7 @@ function TransactionsScreen({ data, setData }) {
           <span>{filtered.length.toLocaleString()} transactions</span>
           <span><span className="txs-out">−{FMT_USD(totals.out)}</span> · <span className="txs-in">+{FMT_USD(totals.inn)}</span></span>
         </div>
-        {updatedInfo && <div className="txs-updated"><b>{updatedInfo.name}</b> {updatedInfo.label} {updatedInfo.date}</div>}
+        {updatedInfo && <div className="txs-updated"><b>{updatedInfo.name}</b> {updatedInfo.label} {updatedInfo.date} · balance <b>{FMT_USD(updatedInfo.balance)}</b></div>}
         {lastEntered && <div className="txs-updated txs-last-entered" onClick={() => openEdit(lastEntered)}>
           Last entered: <b>{lastEntered.payee || '(no payee)'}</b> {lastEntered.credit ? '+' : '−'}{FMT_USD(lastEntered.credit || lastEntered.debit || 0)} · {displayDate(lastEntered.date)}
         </div>}

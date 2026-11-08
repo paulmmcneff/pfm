@@ -99,6 +99,10 @@
     .carryover-chip em { color: #999; font-style: normal; font-size: 11px; font-weight: 400; }
     .carryover-chip button { border: none; background: #f6e2b3; color: #7a5200; cursor: pointer; border-radius: 3px; font-size: 10px; padding: 1px 5px; font-weight: 600; }
     .carryover-chip button:hover { background: #eccf8e; }
+    .carryover-toggle { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #7a5200; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+    .carryover-caret { display: inline-block; transition: transform .15s; font-size: 12px; }
+    .carryover-caret.open { transform: rotate(90deg); }
+    .carryover-count { margin-left: auto; background: #f0c36d; color: #7a5200; border-radius: 10px; padding: 0 7px; font-size: 11px; font-weight: 700; }
     .carryover-hint { font-size: 11px; color: #a08040; font-weight: 400; }
     .carryover-restore { border: none; background: none; color: #3a6090; cursor: pointer; font-size: 11px; text-decoration: underline; padding: 0; }
     .carryover-skipped-note { font-size: 11px; color: #999; margin-bottom: 8px; }
@@ -512,7 +516,7 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const APP_VERSION = 'm25'; // mobile app's own version counter — separate from the desktop file's v-numbers
+const APP_VERSION = 'm26'; // mobile app's own version counter — separate from the desktop file's v-numbers
 const { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } = React;
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
@@ -1173,6 +1177,8 @@ function CashflowScreen({ data, setData }) {
 
   // ── Coordinate overlay ──────────────────────────────────────────────────────
   const [showCoords, setShowCoords] = useState(() => localStorage.getItem('pfm_coords') === 'true');
+  const [carryCollapsed, setCarryCollapsed] = useState(() => { try { return localStorage.getItem('pfm_carry_collapsed') === 'true'; } catch { return false; } });
+  const toggleCarryCollapsed = () => setCarryCollapsed(v => { const n = !v; try { localStorage.setItem('pfm_carry_collapsed', n); } catch {} return n; });
 
   // ── Freeze panes at C3: rows 1–2 (header rows) AND columns A–B via sticky ────
   // useLayoutEffect with no dep array: re-stamps after every render so freshly-
@@ -1588,7 +1594,12 @@ function CashflowScreen({ data, setData }) {
         return (<>
       {(visibleEntries.length > 0 || visibleAbsorbed.length > 0) && (
         <div className="carryover-banner">
-          <strong>⚠ Carried over from a previous pay period:</strong>
+          <button type="button" className="carryover-toggle" onClick={toggleCarryCollapsed} aria-expanded={!carryCollapsed}>
+            <span className={`carryover-caret${carryCollapsed ? '' : ' open'}`}>▸</span>
+            <strong>⚠ Carried over from a previous pay period</strong>
+            <span className="carryover-count">{visibleEntries.length + visibleAbsorbed.length}</span>
+          </button>
+          {!carryCollapsed && <>
           {visibleEntries.map(e => (
             <span key={e.key} className="carryover-chip">
               {e.name} {FMT_USD(e.amount)} <em>from {e.fromLabel}</em>
@@ -1609,6 +1620,7 @@ function CashflowScreen({ data, setData }) {
           {dismissedCount > 0 && (
             <button className="carryover-restore" onClick={restoreDismissedCarryovers}>restore {dismissedCount} dismissed</button>
           )}
+          </>}
         </div>
       )}
       {visibleEntries.length === 0 && visibleAbsorbed.length === 0 && (carryRecon.skippedEntries.length > 0 || dismissedCount > 0) && (
